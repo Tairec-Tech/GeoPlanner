@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoPlanner - Inicia Sesión</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #003366, #007BFF);
+      min-height: 100vh;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .login-container {
+      background-color: #ffffff10;
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 2rem;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 0 15px #00000050;
+    }
+
+    .logo {
+      width: 100px;
+      margin-bottom: 1rem;
+    }
+
+    .btn-custom {
+      background-color: #00bfff;
+      border: none;
+    }
+
+    .btn-custom:hover {
+      background-color: #009acc;
+    }
+
+    .tagline {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      color: #cfeaff;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container text-center">
+    <img src="img/Logo.png" alt="Logo GeoPlanner" class="logo" />
+    <h2>Bienvenido a GeoPlanner</h2>
+    <p class="tagline">Planifica, conecta y colabora... ¡Geográficamente!</p>
+    
+    <form>
+      <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="usuario" placeholder="@usuario">
+        <label for="usuario">@Usuario o Correo</label>
+      </div>
+      <div class="form-floating mb-3">
+        <input type="password" class="form-control" id="password" placeholder="Contraseña">
+        <label for="password">Contraseña</label>
+      </div>
+      <button type="submit" class="btn btn-custom w-100">Iniciar Sesión</button>
+    </form>
+    
+    <hr class="my-4" style="border-color: #ffffff33;">
+    
+    <p>¿Nuevo en GeoPlanner? <a href="#" class="text-info">Regístrate aquí</a></p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
