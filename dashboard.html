@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoPlanner - Red Social</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body {
+      background-color: #f0f2f5;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    header {
+      background: linear-gradient(145deg, #007BFF, #003366);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .search-bar input {
+      width: 300px;
+      border-radius: 20px;
+      padding: 0.4rem 1rem;
+      border: none;
+    }
+
+    .icon-bar {
+      position: relative;
+    }
+
+    .icon-bar span {
+      margin-left: 1rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 2rem;
+      background-color: white;
+      color: #333;
+      padding: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      width: 250px;
+      z-index: 2000;
+    }
+
+    .icon-bar span:hover + .dropdown-content,
+    .dropdown-content:hover {
+      display: block;
+    }
+
+    .main-container {
+      display: flex;
+      padding: 1.5rem;
+      gap: 2rem;
+    }
+
+    .sidebar {
+      width: 250px;
+    }
+
+    .feed {
+      flex: 1;
+      max-width: 700px;
+    }
+
+    .post, .new-post {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .post img, .new-post img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-bottom: 0.5rem;
+    }
+
+    .map-container {
+      height: 200px;
+      border-radius: 10px;
+      margin-top: 0.5rem;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .sidebar li {
+      margin-bottom: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .sidebar li:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="d-flex align-items-center gap-2">
+      <img src="img/LogoMini.png" alt="Logo" style="width: 36px;" />
+      <strong class="fs-5">GeoPlanner</strong>
+    </div>
+    <div class="search-bar">
+      <input type="text" placeholder="Buscar personas o grupos..." />
+    </div>
+    <div class="icon-bar">
+      <span title="Solicitudes de amistad">🤝</span>
+      <div class="dropdown-content">Tienes 2 solicitudes de amistad</div>
+
+      <span title="Notificaciones">🔔</span>
+      <div class="dropdown-content">3 nuevas notificaciones</div>
+
+      <span title="Perfil">👤</span>
+      <div class="dropdown-content">Perfil | Configuración | Cerrar sesión</div>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <!-- Menú lateral -->
+    <div class="sidebar">
+      <ul>
+        <li>Inicio</li>
+        <li>Mis Amigos</li>
+        <li>Grupos</li>
+        <li>Mis Eventos</li>
+        <li>Configuración</li>
+      </ul>
+    </div>
+
+    <!-- Publicaciones -->
+    <div class="feed">
+
+      <!-- Crear nueva publicación -->
+      <div class="new-post">
+        <h6><strong>Crear nueva publicación</strong></h6>
+        <textarea class="form-control mb-2" rows="2" placeholder="¿Qué estás organizando?..."></textarea>
+        <input type="file" class="form-control mb-2" accept="image/*" />
+        <input type="text" class="form-control mb-2" placeholder="Ubicación (opcional)" />
+        <button class="btn btn-primary w-100">Publicar</button>
+      </div>
+
+      <!-- Ejemplo de publicación -->
+      <div class="post">
+        <h6><strong>@carlos_martinez</strong> organizó un encuentro 📍</h6>
+        <p>Nos vemos el sábado a las 3PM en el parque central para una sesión de estudio. ¡Lleven sus laptops! 💻📚</p>
+        <img src="img/estudio.jpg" alt="Encuentro de estudio" />
+        <div id="map1" class="map-container"></div>
+      </div>
+
+      <!-- Otra publicación -->
+      <div class="post">
+        <h6><strong>@valentina_g</strong> compartió un picnic 🧺</h6>
+        <p>Picnic con amigos en el Jardín Botánico este domingo. ¡Trae algo para compartir! 🌼</p>
+        <div id="map2" class="map-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Primer mapa
+    const map1 = L.map('map1').setView([10.659, -71.611], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map1);
+    L.marker([10.659, -71.611]).addTo(map1);
+
+    // Segundo mapa
+    const map2 = L.map('map2').setView([10.661, -71.618], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map2);
+    L.marker([10.661, -71.618]).addTo(map2);
+  </script>
+</body>
+</html>
