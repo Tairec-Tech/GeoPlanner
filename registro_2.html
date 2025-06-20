@@ -170,5 +170,38 @@
       }
     });
   </script>
+  <script>
+  document.querySelector("form").addEventListener("submit", function (e) {
+    e.preventDefault(); // Prevenimos el envío del formulario
+
+    const pass = document.getElementById("password").value;
+    const confirm = document.getElementById("confirmPassword").value;
+
+    if (pass !== confirm) {
+      alert("Las contraseñas no coinciden.");
+      return; // Detenemos la ejecución si no coinciden
+    }
+
+    // Recuperamos los datos del paso anterior
+    let registroParcial = JSON.parse(localStorage.getItem('registroParcial'));
+
+    if (!registroParcial) {
+        alert("Hubo un error, por favor regresa al primer paso.");
+        window.location.href = 'registro_1.html';
+        return;
+    }
+
+    // Agregamos los nuevos datos
+    registroParcial.nombreUsuario = document.getElementById('nombreUsuario').value;
+    registroParcial.email = document.getElementById('email').value;
+    registroParcial.password = pass; // Guardamos la contraseña
+
+    // Actualizamos los datos temporales
+    localStorage.setItem('registroParcial', JSON.stringify(registroParcial));
+
+    // Redirigimos al último paso
+    window.location.href = 'registro_3.html';
+  });
+</script>
 </body>
 </html>

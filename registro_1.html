@@ -247,5 +247,26 @@
       });
     });
   </script>
+  <script>
+  document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault(); // Evita que la página se recargue
+
+    const registroParcial = {
+      nombre: document.getElementById('nombre').value,
+      apellido: document.getElementById('apellido').value,
+      diaNacimiento: document.getElementById('dia').value,
+      mesNacimiento: document.getElementById('mes').value,
+      anioNacimiento: document.getElementById('anio').value,
+      genero: document.querySelector('input[name="genero"]:checked')?.value,
+      otroGenero: document.getElementById('otroGeneroInput').value
+    };
+
+    // Guardamos los datos temporalmente en el navegador
+    localStorage.setItem('registroParcial', JSON.stringify(registroParcial));
+
+    // Redirigimos al siguiente paso
+    window.location.href = 'registro_2.html';
+  });
+</script>
 </body>
 </html>

@@ -198,14 +198,40 @@
     </footer>
 
   <script>
-    const button = document.querySelector('.btn-custom');
-    button.addEventListener('click', function (e) {
-      const rect = this.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      this.style.setProperty('--x', `${x}px`);
-      this.style.setProperty('--y', `${y}px`);
-    });
-  </script>
+  // Script para el efecto ripple del botón (ya lo tenías)
+  const button = document.querySelector('.btn-custom');
+  button.addEventListener('mousedown', function (e) { // Usamos mousedown para mejor efecto
+    const rect = this.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    this.style.setProperty('--x', `${x}px`);
+    this.style.setProperty('--y', `${y}px`);
+  });
+
+  // Lógica para el inicio de sesión
+  document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const userInput = document.getElementById('usuario').value;
+    const passwordInput = document.getElementById('password').value;
+
+    // Obtenemos la lista de usuarios de nuestra "base de datos"
+    const usuarios = JSON.parse(localStorage.getItem('geoPlannerUsers')) || [];
+
+    // Buscamos un usuario que coincida con el usuario/correo y la contraseña
+    const usuarioEncontrado = usuarios.find(user =>
+      (user.nombreUsuario === userInput || user.email === userInput) && user.password === passwordInput
+    );
+
+    if (usuarioEncontrado) {
+      alert(`¡Bienvenido de nuevo, ${usuarioEncontrado.nombre}!`);
+      // Guardamos al usuario actual en sessionStorage para que la sesión dure solo mientras la pestaña esté abierta
+      sessionStorage.setItem('currentUser', JSON.stringify(usuarioEncontrado));
+      window.location.href = 'dashboard.html';
+    } else {
+      alert('Usuario o contraseña incorrectos. Por favor, inténtalo de nuevo.');
+    }
+  });
+</script>
 </body>
 </html>

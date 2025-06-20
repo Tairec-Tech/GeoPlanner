@@ -7,6 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <style>
     body {
       background-color: #f0f2f5;
@@ -22,7 +23,7 @@
       align-items: center;
       position: sticky;
       top: 0;
-      z-index: 1000;
+      z-index: 1030; /* Elevado para estar sobre el modal-backdrop */
     }
 
     .search-bar input {
@@ -34,47 +35,127 @@
 
     .icon-bar {
       position: relative;
+      display: flex;
+      gap: 0.5rem;
     }
 
-    .icon-bar span {
-      margin-left: 1rem;
+    .icon-button {
+      background-color: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 1.2rem;
       cursor: pointer;
-      position: relative;
+      transition: background-color 0.2s;
     }
 
+    .icon-button:hover {
+        background-color: rgba(255, 255, 255, 0.25);
+    }
+    
     .dropdown-content {
       display: none;
       position: absolute;
       right: 0;
-      top: 2rem;
+      top: 55px;
       background-color: white;
       color: #333;
       padding: 1rem;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       border-radius: 10px;
-      width: 250px;
+      width: 360px;
       z-index: 2000;
+      border: 1px solid #ddd;
+    }
+    
+    .dropdown-content.show {
+        display: block;
+    }
+    
+    .dropdown-header {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
     }
 
-    .icon-bar span:hover + .dropdown-content,
-    .dropdown-content:hover {
-      display: block;
+    .dropdown-item-custom {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.5rem;
+        border-radius: 8px;
+        transition: background-color 0.2s;
+    }
+    .dropdown-item-custom:hover {
+        background-color: #f0f2f5;
+        text-decoration: none;
+        color: inherit;
+    }
+    .dropdown-item-custom img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .notification-buttons button {
+        flex: 1;
+        padding: 0.5rem;
     }
 
     .main-container {
       display: flex;
+      justify-content: center;
       padding: 1.5rem;
       gap: 2rem;
     }
 
-    .sidebar {
+    .left-sidebar {
       width: 250px;
+      background: linear-gradient(145deg, #007BFF, #003366);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      height: fit-content;
+      position: sticky;
+      top: 90px;
     }
 
+    .left-sidebar ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .left-sidebar li {
+      margin-bottom: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 8px;
+      transition: background-color 0.2s;
+    }
+
+    .left-sidebar li:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+    
     .feed {
       flex: 1;
-      max-width: 700px;
+      max-width: 680px;
+    }
+    
+    .right-sidebar {
+        width: 300px;
+        background-color: #fff;
+        padding: 1rem;
+        border-radius: 10px;
+        height: fit-content;
+        position: sticky;
+        top: 90px;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
     }
 
     .post, .new-post {
@@ -96,20 +177,29 @@
       border-radius: 10px;
       margin-top: 0.5rem;
     }
-
-    .sidebar ul {
-      list-style: none;
-      padding-left: 0;
+    
+    /* --- ESTILOS PARA LA NUEVA SECCIÓN DE PUBLICACIÓN --- */
+    #location-display {
+        border: 1px dashed #ccc;
+        padding: 0.5rem;
+        border-radius: 8px;
+        min-height: 40px;
+        background-color: #f8f9fa;
+        color: #6c757d;
     }
-
-    .sidebar li {
-      margin-bottom: 1rem;
-      font-weight: 500;
-      cursor: pointer;
+    #post-map-preview-container {
+        height: 0;
+        transition: height 0.3s ease;
+        border-radius: 10px;
+        margin-top: 0.5rem;
+        overflow: hidden;
     }
-
-    .sidebar li:hover {
-      text-decoration: underline;
+    #map-modal .modal-dialog {
+        max-width: 800px;
+    }
+    #modal-map-container {
+        height: 50vh;
+        border-radius: 10px;
     }
   </style>
 </head>
@@ -124,42 +214,98 @@
       <input type="text" placeholder="Buscar personas o grupos..." />
     </div>
     <div class="icon-bar">
-      <span title="Solicitudes de amistad">🤝</span>
-      <div class="dropdown-content">Tienes 2 solicitudes de amistad</div>
+      <span class="icon-button" id="requests-icon" title="Solicitudes de amistad">🤝</span>
+      <div class="dropdown-content" id="requests-dropdown">
+        <div class="dropdown-header">Solicitudes de amistad</div>
+        <a href="#" class="dropdown-item-custom">
+            <img src="img/placeholder.png" alt="user">
+            <div>
+                <strong>Ana Rodriguez</strong> quiere ser tu amiga.
+                <div class="d-flex gap-2 mt-2 notification-buttons">
+                    <button class="btn btn-primary btn-sm">Aceptar</button>
+                    <button class="btn btn-secondary btn-sm">Rechazar</button>
+                </div>
+            </div>
+        </a>
+        <hr class="my-2">
+        <a href="#" class="dropdown-item-custom">
+            <img src="img/placeholder.png" alt="user">
+            <div>
+                <strong>Luis Perez</strong> te envió una solicitud.
+                <div class="d-flex gap-2 mt-2 notification-buttons">
+                    <button class="btn btn-primary btn-sm">Aceptar</button>
+                    <button class="btn btn-secondary btn-sm">Rechazar</button>
+                </div>
+            </div>
+        </a>
+      </div>
 
-      <span title="Notificaciones">🔔</span>
-      <div class="dropdown-content">3 nuevas notificaciones</div>
+      <span class="icon-button" id="notifications-icon" title="Notificaciones">🔔</span>
+      <div class="dropdown-content" id="notifications-dropdown">
+        <div class="dropdown-header">Notificaciones</div>
+        <a href="#" class="dropdown-item-custom">
+            <img src="img/estudio.jpg" alt="event">
+            <div><strong>@carlos_martinez</strong> comentó en tu publicación: "¡Allí estaré!".</div>
+        </a>
+        <hr class="my-2">
+        <a href="#" class="dropdown-item-custom">
+            <img src="img/LogoMini.png" alt="system">
+            <div>A <strong>3 personas</strong> más les gustó tu evento "Picnic con amigos".</div>
+        </a>
+         <hr class="my-2">
+        <a href="#" class="dropdown-item-custom">
+            <img src="img/placeholder.png" alt="group">
+            <div>Se ha creado un nuevo evento en el grupo "Amantes del Senderismo".</div>
+        </a>
+      </div>
 
-      <span title="Perfil">👤</span>
-      <div class="dropdown-content">Perfil | Configuración | Cerrar sesión</div>
+      <span class="icon-button" id="profile-icon" title="Perfil">👤</span>
+      <div class="dropdown-content" id="profile-dropdown">
+        <a href="#" class="dropdown-item-custom">
+             <img src="img/placeholder.png" alt="profile">
+            <div>
+                <div class="fw-bold">Juan Sarcos</div>
+                <small>Ver tu perfil</small>
+            </div>
+        </a>
+        <hr class="my-2">
+         <a href="#" class="dropdown-item-custom">
+            <span>⚙️</span>
+            <div><strong>Configuración</strong></div>
+        </a>
+         <a href="index.html" class="dropdown-item-custom" id="logout-button">
+            <span>➡️</span>
+            <div><strong>Cerrar sesión</strong></div>
+        </a>
+      </div>
     </div>
   </header>
 
   <div class="main-container">
-    <!-- Menú lateral -->
-    <div class="sidebar">
+    <aside class="left-sidebar d-none d-lg-block">
       <ul>
-        <li>Inicio</li>
-        <li>Mis Amigos</li>
-        <li>Grupos</li>
-        <li>Mis Eventos</li>
-        <li>Configuración</li>
+        <li>🏠 Inicio</li>
+        <li>🧑‍🤝‍🧑 Mis Amigos</li>
+        <li>👨‍👩‍👧‍👦 Grupos</li>
+        <li>📅 Mis Eventos</li>
       </ul>
-    </div>
+    </aside>
 
-    <!-- Publicaciones -->
-    <div class="feed">
-
-      <!-- Crear nueva publicación -->
+    <main class="feed">
       <div class="new-post">
         <h6><strong>Crear nueva publicación</strong></h6>
         <textarea class="form-control mb-2" rows="2" placeholder="¿Qué estás organizando?..."></textarea>
         <input type="file" class="form-control mb-2" accept="image/*" />
-        <input type="text" class="form-control mb-2" placeholder="Ubicación (opcional)" />
-        <button class="btn btn-primary w-100">Publicar</button>
-      </div>
+        
+        <button class="btn btn-outline-primary w-100 mb-2" type="button" data-bs-toggle="modal" data-bs-target="#map-modal">
+            📍 Seleccionar Ubicación (Obligatorio)
+        </button>
+        <div id="location-display" class="mb-2">No se ha seleccionado ninguna ubicación.</div>
+        
+        <div id="post-map-preview-container"></div>
 
-      <!-- Ejemplo de publicación -->
+        <button id="publish-button" class="btn btn-primary w-100" disabled>Publicar</button>
+      </div>
       <div class="post">
         <h6><strong>@carlos_martinez</strong> organizó un encuentro 📍</h6>
         <p>Nos vemos el sábado a las 3PM en el parque central para una sesión de estudio. ¡Lleven sus laptops! 💻📚</p>
@@ -167,29 +313,216 @@
         <div id="map1" class="map-container"></div>
       </div>
 
-      <!-- Otra publicación -->
       <div class="post">
         <h6><strong>@valentina_g</strong> compartió un picnic 🧺</h6>
         <p>Picnic con amigos en el Jardín Botánico este domingo. ¡Trae algo para compartir! 🌼</p>
         <div id="map2" class="map-container"></div>
       </div>
+    </main>
+    
+    <aside class="right-sidebar d-none d-xl-block">
+       <h6 class="fw-bold mb-3">Eventos Cercanos a Ti 🗺️</h6>
+       
+       <div class="d-flex flex-column gap-3">
+           <div class="d-flex gap-2">
+               <img src="img/estudio.jpg" alt="evento" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+               <div>
+                   <div class="fw-bold">Tarde de Cine</div>
+                   <small class="text-muted">Cinex, a 2.5 km</small>
+                   <a href="#" class="d-block">Ver más</a>
+               </div>
+           </div>
+           <div class="d-flex gap-2">
+               <img src="img/placeholder.png" alt="evento" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+               <div>
+                   <div class="fw-bold">Concierto Acústico</div>
+                   <small class="text-muted">Plaza de la República, a 1.2 km</small>
+                    <a href="#" class="d-block">Ver más</a>
+               </div>
+           </div>
+           <div class="d-flex gap-2">
+               <img src="img/LogoMini.png" alt="evento" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+               <div>
+                   <div class="fw-bold">Torneo de Ajedrez</div>
+                   <small class="text-muted">Biblioteca Pública, a 800 m</small>
+                    <a href="#" class="d-block">Ver más</a>
+               </div>
+           </div>
+       </div>
+    </aside>
+    
+  </div>
+
+  <div class="modal fade" id="map-modal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mapModalLabel">Define la ubicación de tu evento</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <ul class="nav nav-tabs" id="route-type-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="simple-route-tab" data-bs-toggle="tab" data-bs-target="#map-panel" type="button" role="tab">📍 Ruta Simple</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="multiple-route-tab" data-bs-toggle="tab" data-bs-target="#map-panel" type="button" role="tab">➯ Ruta Múltiple</button>
+                </li>
+            </ul>
+            
+            <p class="form-text mt-2">
+                <strong>Ruta Simple:</strong> Haz clic en el mapa para colocar un único marcador.<br>
+                <strong>Ruta Múltiple:</strong> Haz clic en varios puntos para trazar una ruta.
+            </p>
+
+            <div id="modal-map-container" class="mt-3"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" id="clear-map-button">Limpiar Mapa</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="accept-location-button">Aceptar</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <script>
-    // Primer mapa
-    const map1 = L.map('map1').setView([10.659, -71.611], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map1);
-    L.marker([10.659, -71.611]).addTo(map1);
 
-    // Segundo mapa
-    const map2 = L.map('map2').setView([10.661, -71.618], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map2);
-    L.marker([10.661, -71.618]).addTo(map2);
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // --- LÓGICA PARA LOS MAPAS DE EJEMPLO ---
+        const map1 = L.map('map1').setView([10.659, -71.611], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map1);
+        L.marker([10.659, -71.611]).addTo(map1);
+
+        const map2 = L.map('map2').setView([10.661, -71.618], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map2);
+        L.marker([10.661, -71.618]).addTo(map2);
+    
+        // --- LÓGICA PARA LOS MENÚS DESPLEGABLES ---
+        const dropdownIcons = {
+            'requests-icon': 'requests-dropdown',
+            'notifications-icon': 'notifications-dropdown',
+            'profile-icon': 'profile-dropdown'
+        };
+
+        const closeAllDropdowns = () => {
+            Object.values(dropdownIcons).forEach(dropdownId => {
+                const dropdown = document.getElementById(dropdownId);
+                if (dropdown) dropdown.classList.remove('show');
+            });
+        };
+
+        Object.keys(dropdownIcons).forEach(iconId => {
+            const icon = document.getElementById(iconId);
+            const dropdown = document.getElementById(dropdownIcons[iconId]);
+            if (icon && dropdown) {
+                icon.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    const isCurrentlyShown = dropdown.classList.contains('show');
+                    closeAllDropdowns();
+                    if (!isCurrentlyShown) {
+                        dropdown.classList.add('show');
+                    }
+                });
+            }
+        });
+
+        window.addEventListener('click', () => closeAllDropdowns());
+        
+        const logoutButton = document.getElementById('logout-button');
+        if(logoutButton) {
+            logoutButton.addEventListener('click', () => alert("Cerrando sesión..."));
+        }
+
+        // --- LÓGICA PARA EL MAPA DE CREAR PUBLICACIÓN ---
+        const mapModalEl = document.getElementById('map-modal');
+        const acceptLocationButton = document.getElementById('accept-location-button');
+        const clearMapButton = document.getElementById('clear-map-button');
+        const publishButton = document.getElementById('publish-button');
+        const locationDisplay = document.getElementById('location-display');
+        const postMapPreviewContainer = document.getElementById('post-map-preview-container');
+        
+        let modalMap, postPreviewMap;
+        let routeType = 'simple';
+        let markers = [];
+        let polyline = null;
+        
+        const geoPlannerIcon = L.icon({
+            iconUrl: 'img/LogoMini.png',
+            iconSize: [40, 40],
+            iconAnchor: [20, 40],
+        });
+
+        mapModalEl.addEventListener('shown.bs.modal', function () {
+            if (!modalMap) {
+                modalMap = L.map('modal-map-container').setView([10.654, -71.612], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(modalMap);
+                modalMap.on('click', onMapClick);
+            }
+            setTimeout(() => modalMap.invalidateSize(), 10);
+        });
+
+        document.getElementById('simple-route-tab').addEventListener('click', () => {
+            routeType = 'simple';
+            clearMap();
+        });
+        document.getElementById('multiple-route-tab').addEventListener('click', () => {
+            routeType = 'multiple';
+            clearMap();
+        });
+        
+        const onMapClick = (e) => {
+            if (routeType === 'simple' && markers.length > 0) clearMap();
+            const newMarker = L.marker(e.latlng, { icon: geoPlannerIcon }).addTo(modalMap);
+            markers.push(newMarker);
+            if (routeType === 'multiple' && markers.length > 1) {
+                if(polyline) modalMap.removeLayer(polyline);
+                polyline = L.polyline(markers.map(m => m.getLatLng()), {color: '#007BFF'}).addTo(modalMap);
+            }
+        };
+        
+        const clearMap = () => {
+            markers.forEach(m => modalMap.removeLayer(m));
+            markers = [];
+            if (polyline) {
+                modalMap.removeLayer(polyline);
+                polyline = null;
+            }
+        };
+        
+        clearMapButton.addEventListener('click', clearMap);
+
+        acceptLocationButton.addEventListener('click', function() {
+            if (markers.length === 0) return;
+
+            const latlngs = markers.map(m => m.getLatLng());
+            locationDisplay.textContent = routeType === 'simple'
+                ? `Ubicación: [${latlngs[0].lat.toFixed(4)}, ${latlngs[0].lng.toFixed(4)}]`
+                : `Ruta Múltiple (${markers.length} puntos)`;
+
+            postMapPreviewContainer.style.height = '200px';
+            if (!postPreviewMap) {
+                postPreviewMap = L.map('post-map-preview-container', { zoomControl: false, scrollWheelZoom: false, dragging: false });
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(postPreviewMap);
+            } else {
+                 postPreviewMap.eachLayer(layer => {
+                    if (layer instanceof L.Marker || layer instanceof L.Polyline) postPreviewMap.removeLayer(layer);
+                });
+            }
+            
+            latlngs.forEach(latlng => L.marker(latlng, { icon: geoPlannerIcon }).addTo(postPreviewMap));
+            if (polyline) {
+                 L.polyline(latlngs, {color: '#007BFF'}).addTo(postPreviewMap);
+            }
+            
+            const bounds = L.latLngBounds(latlngs);
+            postPreviewMap.fitBounds(bounds, { padding: [40, 40] }); // Agrega un margen de 40px
+
+            publishButton.disabled = false;
+            bootstrap.Modal.getInstance(mapModalEl).hide();
+        });
+    });
   </script>
 </body>
 </html>

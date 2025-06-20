@@ -178,7 +178,7 @@
         <div class="mb-3">
           <label class="form-label">Elige tu esquema de color</label>
             <select class="form-select" id="tema">
-            <option disabled selected hidden>Seleccionar tema...</option>
+            <option value="default">Azul GeoPlanner (predeterminado)</option>
             <option value="aurora">Aurora Boreal</option>
             <option value="noche">Cielo Nocturno</option>
             <option value="oceano">Océano Profundo</option>
@@ -195,6 +195,44 @@
           <button type="submit" class="btn btn-custom">Finalizar Registro</button>
         </div>
       </form>
+      <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+          e.preventDefault();
+
+          // 1. Recuperamos los datos de los pasos anteriores
+          let datosRegistro = JSON.parse(localStorage.getItem('registroParcial'));
+          if (!datosRegistro) {
+              alert("Error en el proceso de registro. Por favor, inténtalo de nuevo.");
+              window.location.href = 'registro_1.html';
+              return;
+          }
+
+          // 2. Añadimos los datos finales de este formulario
+          datosRegistro.bio = document.getElementById('bio').value;
+          datosRegistro.latitud = document.getElementById('latitud').value;
+          datosRegistro.longitud = document.getElementById('longitud').value;
+          datosRegistro.ciudad = document.getElementById('ciudad').value;
+          datosRegistro.pais = document.getElementById('pais').value;
+          const temaSeleccionado = document.getElementById('tema').value;
+
+          // 3. Obtenemos la "base de datos" de usuarios o creamos una nueva si no existe
+          let usuarios = JSON.parse(localStorage.getItem('geoPlannerUsers')) || [];
+
+          // 4. Añadimos el nuevo usuario a la base de datos
+          usuarios.push(datosRegistro);
+
+          // 5. Guardamos la base de datos actualizada y el tema seleccionado
+          localStorage.setItem('geoPlannerUsers', JSON.stringify(usuarios));
+          localStorage.setItem('geoPlannerTheme', temaSeleccionado); // Guardamos el tema
+
+          // 6. Limpiamos los datos temporales
+          localStorage.removeItem('registroParcial');
+
+          // 7. Finalizamos
+          alert('¡Registro completado con éxito! Ahora puedes iniciar sesión.');
+          window.location.href = 'index.html';
+        });
+      </script>
     </div>
   </main>
 
@@ -274,6 +312,11 @@
   const labels = document.querySelectorAll(".form-label, .form-text, h2");
 
   const temas = {
+    default: {
+      fondo: "linear-gradient(145deg, #007BFF, #003366)",
+      texto: "white",
+      boton: { fondo: "#00bfff", color: "white" }
+    },
     aurora: {
       fondo: "linear-gradient(145deg, #1D2B64, #F8CDDA)",
       texto: "#222",
