@@ -1,528 +1,2354 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GeoPlanner - Red Social</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <style>
-    body {
-      background-color: #f0f2f5;
-      font-family: 'Segoe UI', sans-serif;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GeoPlanner - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="icon" href="img/LogoMini.png" type="image/x-icon">
+    <style>
+        /* Scrollbar personalizado para el dropdown de temas */
+        #theme-selector-dropdown {
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb, #007BFF) var(--scrollbar-track, #e0e0e0);
+        }
+        #theme-selector-dropdown::-webkit-scrollbar {
+            width: 8px;
+        }
+        #theme-selector-dropdown::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb, #007BFF);
+            border-radius: 6px;
+        }
+        #theme-selector-dropdown::-webkit-scrollbar-track {
+            background: var(--scrollbar-track, #e0e0e0);
+        }
 
-    header {
-      background: linear-gradient(145deg, #007BFF, #003366);
-      color: white;
-      padding: 0.75rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 1030; /* Elevado para estar sobre el modal-backdrop */
-    }
+        /* Botón de búsqueda cambia con el tema */
+        #address-search-btn {
+            background: var(--btn-primary-bg, #007BFF) !important;
+            color: var(--btn-primary-text, #fff) !important;
+            border: none;
+        }
+        #address-search-btn:hover, #address-search-btn:focus {
+            filter: brightness(0.92);
+        }
+    </style>
+    <style>
+        /* Scrollbar personalizado para el dropdown de temas */
+        #theme-selector-dropdown {
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb, #007BFF) var(--scrollbar-track, #e0e0e0);
+        }
+        #theme-selector-dropdown::-webkit-scrollbar {
+            width: 8px;
+        }
+        #theme-selector-dropdown::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb, #007BFF);
+            border-radius: 6px;
+        }
+        #theme-selector-dropdown::-webkit-scrollbar-track {
+            background: var(--scrollbar-track, #e0e0e0);
+        }
 
-    .search-bar input {
-      width: 300px;
-      border-radius: 20px;
-      padding: 0.4rem 1rem;
-      border: none;
-    }
-
-    .icon-bar {
-      position: relative;
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .icon-button {
-      background-color: rgba(255, 255, 255, 0.15);
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    .icon-button:hover {
-        background-color: rgba(255, 255, 255, 0.25);
-    }
-    
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: 55px;
-      background-color: white;
-      color: #333;
-      padding: 1rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      border-radius: 10px;
-      width: 360px;
-      z-index: 2000;
-      border: 1px solid #ddd;
-    }
-    
-    .dropdown-content.show {
-        display: block;
-    }
-    
-    .dropdown-header {
-        font-size: 1.2rem;
-        font-weight: bold;
-        margin-bottom: 1rem;
-    }
-
-    .dropdown-item-custom {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 0.5rem;
-        border-radius: 8px;
-        transition: background-color 0.2s;
-    }
-    .dropdown-item-custom:hover {
-        background-color: #f0f2f5;
-        text-decoration: none;
-        color: inherit;
-    }
-    .dropdown-item-custom img {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .notification-buttons button {
-        flex: 1;
-        padding: 0.5rem;
-    }
-
-    .main-container {
-      display: flex;
-      justify-content: center;
-      padding: 1.5rem;
-      gap: 2rem;
-    }
-
-    .left-sidebar {
-      width: 250px;
-      background: linear-gradient(145deg, #007BFF, #003366);
-      color: white;
-      padding: 1.5rem;
-      border-radius: 10px;
-      height: fit-content;
-      position: sticky;
-      top: 90px;
-    }
-
-    .left-sidebar ul {
-      list-style: none;
-      padding-left: 0;
-    }
-
-    .left-sidebar li {
-      margin-bottom: 1rem;
-      font-weight: 500;
-      cursor: pointer;
-      padding: 0.5rem;
-      border-radius: 8px;
-      transition: background-color 0.2s;
-    }
-
-    .left-sidebar li:hover {
-      background-color: rgba(255, 255, 255, 0.15);
-    }
-    
-    .feed {
-      flex: 1;
-      max-width: 680px;
-    }
-    
-    .right-sidebar {
-        width: 300px;
-        background-color: #fff;
-        padding: 1rem;
-        border-radius: 10px;
-        height: fit-content;
-        position: sticky;
-        top: 90px;
-        box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
-    }
-
-    .post, .new-post {
-      background-color: #fff;
-      border-radius: 10px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
-    }
-
-    .post img, .new-post img {
-      max-width: 100%;
-      border-radius: 10px;
-      margin-bottom: 0.5rem;
-    }
-
-    .map-container {
-      height: 200px;
-      border-radius: 10px;
-      margin-top: 0.5rem;
-    }
-    
-    /* --- ESTILOS PARA LA NUEVA SECCIÓN DE PUBLICACIÓN --- */
-    #location-display {
-        border: 1px dashed #ccc;
-        padding: 0.5rem;
-        border-radius: 8px;
-        min-height: 40px;
-        background-color: #f8f9fa;
-        color: #6c757d;
-    }
-    #post-map-preview-container {
-        height: 0;
-        transition: height 0.3s ease;
-        border-radius: 10px;
-        margin-top: 0.5rem;
-        overflow: hidden;
-    }
-    #map-modal .modal-dialog {
-        max-width: 800px;
-    }
-    #modal-map-container {
-        height: 50vh;
-        border-radius: 10px;
-    }
-  </style>
+    </style>
+    <link rel="stylesheet" href="bootstrap-icons/bootstrap-icons.min.css" />
+    <style>
+        .terms-preview {
+            font-size: 0.8rem;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            background-color: #f8f9fa;
+        }
+        .terms-collapse {
+            transition: all 0.3s ease;
+        }
+        .required-checkbox {
+            border: 2px solid #dc3545 !important;
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            background-color: #fff5f5;
+        }
+        .required-checkbox.valid {
+            border-color: #28a745 !important;
+            background-color: #f8fff9;
+        }
+        .btn-toggle-terms {
+            font-size: 0.875rem;
+            padding: 0.25rem 0.5rem;
+        }
+    </style>
 </head>
+
 <body>
 
-  <header>
-    <div class="d-flex align-items-center gap-2">
-      <img src="img/LogoMini.png" alt="Logo" style="width: 36px;" />
-      <strong class="fs-5">GeoPlanner</strong>
-    </div>
-    <div class="search-bar">
-      <input type="text" placeholder="Buscar personas o grupos..." />
-    </div>
-    <div class="icon-bar">
-      <span class="icon-button" id="requests-icon" title="Solicitudes de amistad">🤝</span>
-      <div class="dropdown-content" id="requests-dropdown">
-        <div class="dropdown-header">Solicitudes de amistad</div>
-        <a href="#" class="dropdown-item-custom">
-            <img src="img/placeholder.png" alt="user">
-            <div>
-                <strong>Ana Rodriguez</strong> quiere ser tu amiga.
-                <div class="d-flex gap-2 mt-2 notification-buttons">
-                    <button class="btn btn-primary btn-sm">Aceptar</button>
-                    <button class="btn btn-secondary btn-sm">Rechazar</button>
-                </div>
+    <header class="d-flex justify-content-between align-items-center">
+        <a href="dashboard.html" class="d-flex align-items-center gap-2 text-white text-decoration-none">
+            <img src="img/LogoMini.png" alt="Logo" style="width: 36px;" />
+            <strong class="fs-5">GeoPlanner</strong>
+        </a>
+        <div class="search-bar position-relative" style="min-width: 300px;">
+            <div class="input-group">
+                <input type="text" id="address-search-input" class="form-control"
+                    placeholder="Buscar dirección o lugar..." autocomplete="off" />
+                <button id="address-search-btn" class="btn btn-primary" type="button">
+                    <i class="bi bi-search"></i>
+                </button>
             </div>
-        </a>
-        <hr class="my-2">
-        <a href="#" class="dropdown-item-custom">
-            <img src="img/placeholder.png" alt="user">
-            <div>
-                <strong>Luis Perez</strong> te envió una solicitud.
-                <div class="d-flex gap-2 mt-2 notification-buttons">
-                    <button class="btn btn-primary btn-sm">Aceptar</button>
-                    <button class="btn btn-secondary btn-sm">Rechazar</button>
-                </div>
+            <div id="address-suggestions" class="list-group position-absolute w-100" style="z-index: 3000; top: 100%;">
             </div>
-        </a>
-      </div>
-
-      <span class="icon-button" id="notifications-icon" title="Notificaciones">🔔</span>
-      <div class="dropdown-content" id="notifications-dropdown">
-        <div class="dropdown-header">Notificaciones</div>
-        <a href="#" class="dropdown-item-custom">
-            <img src="img/estudio.jpg" alt="event">
-            <div><strong>@carlos_martinez</strong> comentó en tu publicación: "¡Allí estaré!".</div>
-        </a>
-        <hr class="my-2">
-        <a href="#" class="dropdown-item-custom">
-            <img src="img/LogoMini.png" alt="system">
-            <div>A <strong>3 personas</strong> más les gustó tu evento "Picnic con amigos".</div>
-        </a>
-         <hr class="my-2">
-        <a href="#" class="dropdown-item-custom">
-            <img src="img/placeholder.png" alt="group">
-            <div>Se ha creado un nuevo evento en el grupo "Amantes del Senderismo".</div>
-        </a>
-      </div>
-
-      <span class="icon-button" id="profile-icon" title="Perfil">👤</span>
-      <div class="dropdown-content" id="profile-dropdown">
-        <a href="#" class="dropdown-item-custom">
-             <img src="img/placeholder.png" alt="profile">
-            <div>
-                <div class="fw-bold">Juan Sarcos</div>
-                <small>Ver tu perfil</small>
-            </div>
-        </a>
-        <hr class="my-2">
-         <a href="#" class="dropdown-item-custom">
-            <span>⚙️</span>
-            <div><strong>Configuración</strong></div>
-        </a>
-         <a href="index.html" class="dropdown-item-custom" id="logout-button">
-            <span>➡️</span>
-            <div><strong>Cerrar sesión</strong></div>
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <div class="main-container">
-    <aside class="left-sidebar d-none d-lg-block">
-      <ul>
-        <li>🏠 Inicio</li>
-        <li>🧑‍🤝‍🧑 Mis Amigos</li>
-        <li>👨‍👩‍👧‍👦 Grupos</li>
-        <li>📅 Mis Eventos</li>
-      </ul>
-    </aside>
-
-    <main class="feed">
-      <div class="new-post">
-        <h6><strong>Crear nueva publicación</strong></h6>
-        <textarea class="form-control mb-2" rows="2" placeholder="¿Qué estás organizando?..."></textarea>
-        <input type="file" class="form-control mb-2" accept="image/*" />
-        
-        <button class="btn btn-outline-primary w-100 mb-2" type="button" data-bs-toggle="modal" data-bs-target="#map-modal">
-            📍 Seleccionar Ubicación (Obligatorio)
-        </button>
-        <div id="location-display" class="mb-2">No se ha seleccionado ninguna ubicación.</div>
-        
-        <div id="post-map-preview-container"></div>
-
-        <button id="publish-button" class="btn btn-primary w-100" disabled>Publicar</button>
-      </div>
-      <div class="post">
-        <h6><strong>@carlos_martinez</strong> organizó un encuentro 📍</h6>
-        <p>Nos vemos el sábado a las 3PM en el parque central para una sesión de estudio. ¡Lleven sus laptops! 💻📚</p>
-        <img src="img/estudio.jpg" alt="Encuentro de estudio" />
-        <div id="map1" class="map-container"></div>
-      </div>
-
-      <div class="post">
-        <h6><strong>@valentina_g</strong> compartió un picnic 🧺</h6>
-        <p>Picnic con amigos en el Jardín Botánico este domingo. ¡Trae algo para compartir! 🌼</p>
-        <div id="map2" class="map-container"></div>
-      </div>
-    </main>
-    
-    <aside class="right-sidebar d-none d-xl-block">
-       <h6 class="fw-bold mb-3">Eventos Cercanos a Ti 🗺️</h6>
-       
-       <div class="d-flex flex-column gap-3">
-           <div class="d-flex gap-2">
-               <img src="img/estudio.jpg" alt="evento" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
-               <div>
-                   <div class="fw-bold">Tarde de Cine</div>
-                   <small class="text-muted">Cinex, a 2.5 km</small>
-                   <a href="#" class="d-block">Ver más</a>
-               </div>
-           </div>
-           <div class="d-flex gap-2">
-               <img src="img/placeholder.png" alt="evento" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
-               <div>
-                   <div class="fw-bold">Concierto Acústico</div>
-                   <small class="text-muted">Plaza de la República, a 1.2 km</small>
-                    <a href="#" class="d-block">Ver más</a>
-               </div>
-           </div>
-           <div class="d-flex gap-2">
-               <img src="img/LogoMini.png" alt="evento" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
-               <div>
-                   <div class="fw-bold">Torneo de Ajedrez</div>
-                   <small class="text-muted">Biblioteca Pública, a 800 m</small>
-                    <a href="#" class="d-block">Ver más</a>
-               </div>
-           </div>
-       </div>
-    </aside>
-    
-  </div>
-
-  <div class="modal fade" id="map-modal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="mapModalLabel">Define la ubicación de tu evento</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-            <ul class="nav nav-tabs" id="route-type-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="simple-route-tab" data-bs-toggle="tab" data-bs-target="#map-panel" type="button" role="tab">📍 Ruta Simple</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="multiple-route-tab" data-bs-toggle="tab" data-bs-target="#map-panel" type="button" role="tab">➯ Ruta Múltiple</button>
-                </li>
-            </ul>
+        <div class="d-flex align-items-center gap-3">
+            <button id="view-toggle-btn" class="btn btn-outline-light btn-sm">Ver Feed Clásico</button>
+            <div class="icon-bar d-flex gap-2">
+
+
+                <span class="icon-button" id="contacto-icon" title="Contacto">👷</span>
+                <div class="dropdown-content" id="contacto-dropdown">
+                    <div class="dropdown-header">Contacto</div>
+                    <a  class="dropdown-item-custom" id="contacto-btn">
+                        <span>✉️</span>
+                        <div>Enviar un correo a soporte</div>
+                    </a>
+                    <a href="https://walink.co/d6e9df" class="dropdown-item-custom" id="contacto-telefono">
+                        <span>📞</span>
+                        <div>Contactar por teléfono</div>
+                    </a>
+                    <a href="./faq.html" target="_blank" class="dropdown-item-custom">
+                        <span>❓</span>
+                        <div>Ver Preguntas Frecuentes</div>
+                    </a>
+                    <a href="./terminos.html" target="_blank" class="dropdown-item-custom">
+                        <span>📜</span>
+                        <div>Leer Términos y Condiciones</div>
+                    </a>
+                    <a href="./privacidad.html" target="_blank" class="dropdown-item-custom">
+                        <span>🔒</span>
+                        <div>Leer Política de Privacidad</div>
+                    </a>
+                </div>
+
+                <span class="icon-button" id="theme-selector-icon" title="Cambiar Tema">🎨</span>
+                <div class="dropdown-content" id="theme-selector-dropdown" style="max-height: 320px; overflow-y: auto;">
+                    <div class="dropdown-header">Seleccionar Tema</div>
+                    <div class="theme-item active" data-theme="default">
+                        <div class="theme-preview" data-theme="default"></div>
+                        <div>
+                            <strong>Predeterminado</strong>
+                            <br><small>Azul clásico</small>
+                        </div>
+                    </div>
+                    <div class="theme-item" data-theme="aurora">
+                        <div class="theme-preview" data-theme="aurora"></div>
+                        <div>
+                            <strong>Aurora</strong>
+                            <br><small>Rosa y azul</small>
+                        </div>
+                    </div>
+                    <div class="theme-item" data-theme="noche">
+                        <div class="theme-preview" data-theme="noche"></div>
+                        <div>
+                            <strong>Noche</strong>
+                            <br><small>Modo oscuro</small>
+                        </div>
+                    </div>
+                    <div class="theme-item" data-theme="oceano">
+                        <div class="theme-preview" data-theme="oceano"></div>
+                        <div>
+                            <strong>Océano</strong>
+                            <br><small>Azul marino</small>
+                        </div>
+                    </div>
+                    <div class="theme-item" data-theme="amanecer">
+                        <div class="theme-preview" data-theme="amanecer"></div>
+                        <div>
+                            <strong>Amanecer</strong>
+                            <br><small>Naranja y rojo</small>
+                        </div>
+                    </div>
+                    <div class="theme-item" data-theme="pastel">
+                        <div class="theme-preview" data-theme="pastel"></div>
+                        <div>
+                            <strong>Pastel</strong>
+                            <br><small>Azul suave</small>
+                        </div>
+                    </div>
+                    <div class="theme-item" data-theme="fuego">
+                        <div class="theme-preview" data-theme="fuego"></div>
+                        <div>
+                            <strong>Fuego</strong>
+                            <br><small>Rojo intenso</small>
+                        </div>
+                    </div>
+                    <div class="theme-item" data-theme="bosque">
+                        <div class="theme-preview" data-theme="bosque"></div>
+                        <div>
+                            <strong>Bosque</strong>
+                            <br><small>Verde natural</small>
+                        </div>
+                    </div>
+                    <div class="theme-item" data-theme="lluvia">
+                        <div class="theme-preview" data-theme="lluvia"></div>
+                        <div>
+                            <strong>Lluvia Eléctrica</strong>
+                            <br><small>Azul eléctrico</small>
+                        </div>
+                    </div>
+                </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <span class="icon-button" id="map-styles-icon" title="Estilos de Mapa">🗺️</span>
+
+                <div class="dropdown-content" id="map-styles-dropdown">
+                    <div class="dropdown-header">Estilos de Mapa</div>
+                    <div class="map-style-item active" data-style="openstreetmap">
+                        <div class="map-style-preview"
+                            style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA2MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjJGMkYyIi8+CjxwYXRoIGQ9Ik0xMCAzMEwyMCAyMEwzMCAzMEw0MCAyMEw1MCAzMCIgc3Ryb2tlPSIjQ0NDIiBzdHJva2Utd2lkdGg9IjIiLz4KPC9zdmc+')">
+                        </div>
+                        <div>
+                            <strong>OpenStreetMap</strong>
+                            <br><small>Mapa estándar con calles</small>
+                        </div>
+                    </div>
+                    <div class="map-style-item" data-style="satellite">
+                        <div class="map-style-preview"
+                            style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA2MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjNEE5MDQyIi8+CjxyZWN0IHg9IjEwIiB5PSIxMCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjE1IiBmaWxsPSIjNjhCMDVGIi8+CjxyZWN0IHg9IjM1IiB5PSIxNSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjOEFEMDgxIi8+Cjwvc3ZnPg==')">
+                        </div>
+                        <div>
+                            <strong>Vista Satelital</strong>
+                            <br><small>Imágenes satelitales</small>
+                        </div>
+                    </div>
+                    <div class="map-style-item" data-style="hybrid_esri">
+                        <div class="map-style-preview"
+                            style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA2MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjNEE5MDQyIi8+CjxyZWN0IHg9IjEwIiB5PSIxMCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjE1IiBmaWxsPSIjNjhCMDVGIi8+CjxyZWN0IHg9IjM1IiB5PSIxNSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjOEFEMDgxIi8+CjxyZWN0IHg9IjAiIHk9IjIwIiB3aWR0aD0iNjAiIGhlaWdodD0iMjAiIGZpbGw9InVybCgjY2hlY2tlcmJvYXJkKSIvPgo8cGF0aCBkPSJNMTAgMjVMMjAgMTVMMzAgMjVMMTggMzlIMTJDMTQgMzcgMTYgMzMgMTggMjUiIHN0cm9rZT0iIzc2Njc2NyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KPC9zdmc+')">
+                        </div>
+                        <div>
+                            <strong>Satélite con Calles</strong>
+                            <br><small>Imágenes + calles</small>
+                        </div>
+                    </div>
+                </div>
+
+                <span class="icon-button" id="notifications-icon" title="Notificaciones">🔔</span>
+                <div class="dropdown-content" id="notifications-dropdown">
+                    <div class="dropdown-header">Notificaciones</div>
+                    <a href="#" class="dropdown-item-custom">
+                        <img src="img/estudio.jpg" alt="event">
+                        <div><strong>@carlos_martinez</strong> comentó en tu publicación.</div>
+                    </a>
+                </div>
+
+                <span class="icon-button" id="profile-icon" title="Perfil">👤</span>
+                <div class="dropdown-content" id="profile-dropdown">
+                    <a href="perfil.html" class="dropdown-item-custom">
+                        <img class="foto-usuario" src="img/placeholder.png" alt="profile">
+                        <div>
+                            <span class="nombre-usuario">Usuario</span>
+                            <svg class="geoplanner-verified-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                fill="currentColor">
+                                <path
+                                    d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm5.71,7.29-6,6a1,1,0,0,1-1.42,0l-3-3a1,1,0,0,1,1.42-1.42L11,13.59l5.29-5.3a1,1,0,0,1,1.42,1.42Z" />
+                            </svg>
+                            <br>
+                            <small>Ver tu perfil</small>
+                        </div>
+                    </a>
+                    <hr class="my-2">
+                    <a href="inicio.html" class="dropdown-item-custom" id="logout-button">
+                        <span>➡️</span>
+                        <div><strong>Cerrar sesión</strong></div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="sidebar-column">
+            <aside class="left-sidebar">
+                <ul>
+                    <li id="menu-agenda">📅 Mi Agenda</li>
+                    <li id="menu-inscripciones">🎟️ Mis Inscripciones</li>
+                    <li id="menu-guardados">⭐ Eventos Guardados</li>
+                    <li>👨‍👩‍👧‍👦 Grupos</li>
+                </ul>
+            </aside>
+            <aside class="left-sidebar-down" id="map-filter-type">
+                <ul>
+                    <li id="1">Todos los tipos</li>
+                    <li id="2">Deporte</li>
+                    <li id="3">Estudio</li>
+                    <li id="4">Social</li>
+                    <li id="5">Cultural</li>
+                    <li id="6">Otro</li>
+                </ul>
+            </aside>
+        </div>
+        <div class="content-area">
+            <div id="map-view-container">
+                <div id="feed-map">
+                    <!-- Botón flotante para crear publicación -->
+                    <button id="floating-create-post-btn" class="btn btn-primary shadow-lg"
+                        style="position: absolute; bottom: 24px; right: 24px; z-index: 1050;" title="Crear publicación">
+                        <span class="floating-btn-icon"><i class="bi bi-plus-lg"></i></span>
+                        <span class="floating-btn-text">Crear Publicación</span>
+                    </button>
+                    <!-- Botón flotante para centrar mapa en la ubicación del usuario -->
+                    <button id="center-map-btn" class="btn btn-light shadow"
+                        style="position: absolute; bottom: 96px; right: 28px; z-index: 1050; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;"
+                        title="Centrar en mi ubicación">
+                        <i class="bi bi-crosshair"></i>
+                    </button>
+                </div>
+                <div id="event-detail-sidebar"></div>
+                <!-- El botón de cerrar se agrega dinámicamente en el JS -->
+            </div>
+            <div id="classic-feed-container">
+                <div id="classic-feed-view">
+                    <div class="create-post-widget">
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="img/placeholder.png" class="foto-usuario" alt="user"
+                                style="width: 40px; height: 40px; border-radius: 50%;">
+                            <div class="create-post-widget-input" data-bs-toggle="modal"
+                                data-bs-target="#create-post-modal">
+                                ¿Qué estás organizando, <span class="nombre-usuario-short">Usuario</span>?
+                            </div>
+                        </div>
+                    </div>
+                    <div id="classic-feed-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="new-post-button" data-bs-toggle="modal" data-bs-target="#create-post-modal">+</button>
+
+    <!-- Modal: Crear Nueva Publicación -->
+    <div class="modal fade" id="create-post-modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Crear Nueva Publicación</h5>
+                    <button class="btn btn-sm btn-outline-primary" id="generate-ideas-btn">Generar Ideas ✨</button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-post-form">
+                        <div class="input-group mb-3">
+                            <textarea id="post-text" class="form-control" rows="3"
+                                placeholder="¿Qué estás organizando?..."></textarea>
+                            <button class="btn btn-outline-secondary" type="button" id="enhance-text-btn"
+                                title="Mejorar texto con IA">✨</button>
+                        </div>
+                        <div id="idea-suggestions" class="mb-3"></div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <select class="form-select" id="post-type">
+                                    <option>Social</option>
+                                    <option>Deporte</option>
+                                    <option>Estudio</option>
+                                    <option>Cultural</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <input type="datetime-local" id="post-date" class="form-control">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <select class="form-select" id="post-privacy">
+                                    <option value="publica">Pública</option>
+                                    <option value="amigos">Solo amigos</option>
+                                    <option value="privada">Privada con invitación</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <input type="file" id="file-media" class="form-control" accept="image/*" />
+                        </div>
+                        <div class="mb-3">
+                            <button class="btn btn-outline-primary w-100" type="button" data-bs-toggle="modal"
+                                data-bs-target="#map-select-modal" id="publicacion-location-btn">
+                                📍 Seleccionar Ubicación
+                            </button>
+                            <div id="location-display" class="mt-2">No se ha seleccionado ninguna ubicación.</div>
+                        </div>
+
+                        <!-- SECCIÓN DE TÉRMINOS Y CONDICIONES MODIFICADA -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Términos y Condiciones</label>
+                            
+                            <!-- Checkbox obligatorio para aceptar términos de GeoPlanner -->
+                            <div class="required-checkbox mb-3" id="terms-checkbox-container">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="accept-geoplanner-terms" required>
+                                    <label class="form-check-label fw-semibold" for="accept-geoplanner-terms">
+                                        <span class="text-danger">*</span> Acepto los Términos y Condiciones de GeoPlanner
+                                    </label>
+                                </div>
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-outline-info btn-sm btn-toggle-terms" id="toggle-terms-btn">
+                                        <i class="bi bi-chevron-down"></i> Ver términos completos
+                                    </button>
+                                </div>
+                                
+                                <!-- Términos predeterminados colapsables -->
+                                <div class="collapse mt-2" id="terms-collapse">
+                                    <div class="terms-preview">
+                                        <h6 class="fw-bold text-primary">Términos y Condiciones de GeoPlanner</h6>
+                                        <p class="mb-2"><strong>1. Responsabilidad Exclusiva del Organizador:</strong> 
+                                        Usted es el único responsable de la legalidad, seguridad (permisos, control de multitudes, etc.) y contenido de su evento.</p>
+                                        
+                                        <p class="mb-2"><strong>2. Deslinde de GeoPlanner:</strong> 
+                                        GeoPlanner es solo una plataforma tecnológica y no se hace responsable por ningún incidente, daño o consecuencia legal relacionada con el evento.</p>
+                                        
+                                        <p class="mb-2"><strong>3. Prohibiciones Estrictas:</strong> 
+                                        Se prohíben terminantemente eventos con actividades ilegales, armas, sustancias ilícitas, violencia o discursos de odio.</p>
+                                        
+                                        <p class="mb-2"><strong>4. Cooperación con Autoridades:</strong> 
+                                        Al publicar, confirma que su identidad fue verificada y acepta que su información puede ser compartida con las autoridades si se detecta alguna ilegalidad.</p>
+                                        
+                                        <p class="mb-2"><strong>5. Verificación de Identidad:</strong> 
+                                        Usted declara que ha proporcionado información veraz y que su identidad ha sido verificada por la plataforma.</p>
+                                        
+                                        <p class="mb-0 text-warning"><strong>⚠️ Al publicar, declara que ha leído y aceptado estos términos en su totalidad.</strong></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Términos adicionales opcionales -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Términos Adicionales (Opcional)</label>
+                                <p class="form-text small mb-2">
+                                    Puedes agregar términos específicos para tu evento. Los términos de GeoPlanner siempre se aplicarán.
+                                </p>
+                                <textarea id="additional-terms-textarea" class="form-control" rows="3"
+                                    placeholder="Ejemplo: Traer identificación, llegar 15 minutos antes, vestimenta deportiva requerida, etc."></textarea>
+                                <div class="form-text">
+                                    <small class="text-muted">Estos términos se añadirán a los términos básicos de GeoPlanner.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="publish-button">Publicar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Seleccionar Ubicación -->
+    <div class="modal fade" id="map-select-modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Define la ubicación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" data-bs-target="#create-post-modal"
+                        data-bs-toggle="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active" id="simple-route-tab">📍 Ruta Simple</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" id="multiple-route-tab">➯ Ruta Múltiple</button>
+                        </li>
+                    </ul>
+                    <p class="form-text mt-2">
+                        <strong>Ruta Simple:</strong> Un único marcador.<br>
+                        <strong>Ruta Múltiple:</strong> Traza una ruta con varios puntos.
+                    </p>
+                    <div class="mb-3 position-relative" id="modal-search-bar-container">
+                        <div class="input-group">
+                            <input type="text" id="modal-address-search-input" class="form-control"
+                                placeholder="Buscar dirección o lugar..." autocomplete="off" />
+                            <button id="modal-address-search-btn" class="btn btn-primary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                        <div id="modal-address-suggestions" class="list-group position-absolute w-100"
+                            style="z-index: 3000; top: 100%;"></div>
+                    </div>
+                    <div id="modal-map-container"></div>
+                    <div id="ruta-inputs" class="mt-3"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" id="clear-map-button">Limpiar Mapa</button>
+                    <button type="button" class="btn btn-primary" id="accept-location-button">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Agenda -->
+    <div class="modal fade" id="agenda-modal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Mi Agenda Privada</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>Nueva Actividad</h6>
+                            <form id="agenda-form">
+                                <div class="mb-2"><input type="text" id="agenda-title" class="form-control"
+                                        placeholder="Título de la actividad" required></div>
+                                <div class="mb-2"><textarea id="agenda-desc" class="form-control" rows="3"
+                                        placeholder="Descripción..."></textarea></div>
+                                <div class="mb-2"><input type="datetime-local" id="agenda-date" class="form-control"
+                                        required></div>
+                                <div class="mb-2">
+                                    <button class="btn btn-outline-primary w-100" type="button" data-bs-toggle="modal" data-bs-target="#map-select-modal" id="agenda-location-btn">
+                                        📍 Seleccionar Ubicación
+                                    </button>
+                                    <div id="agenda-location-display" class="mt-2">No se ha seleccionado ninguna ubicación.</div>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Guardar Actividad</button>
+                            </form>
+                        </div>
+                        <div class="col-md-8">
+                            <h6>Mis Actividades</h6>
+                            <div id="agenda-list" class="list-group"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Eventos Guardados -->
+    <div class="modal fade" id="saved-events-modal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Mis Eventos Guardados</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="saved-events-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-bar">
+        <div class="container-fluid d-flex flex-wrap justify-content-between align-items-center px-4 py-3">
+            <span class="footer-text">© 2025 GeoPlanner. Todos los derechos reservados — Creado por The GeoPlanner Group.</span>
+            <div class="footer-links d-flex flex-wrap gap-3">
+                <a href="terminos.html" class="footer-link" target="_blank">Términos</a>
+                <a href="privacidad.html" class="footer-link" target="_blank">Privacidad</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
             
-            <p class="form-text mt-2">
-                <strong>Ruta Simple:</strong> Haz clic en el mapa para colocar un único marcador.<br>
-                <strong>Ruta Múltiple:</strong> Haz clic en varios puntos para trazar una ruta.
-            </p>
-
-            <div id="modal-map-container" class="mt-3"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-warning" id="clear-map-button">Limpiar Mapa</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-primary" id="accept-location-button">Aceptar</button>
-        </div>
-      </div>
-    </div>
-  </div>
+            // Redirección a Gmail al hacer click en el botón de contacto
+            const contactoBtn = document.getElementById('contacto-btn');
+            if (contactoBtn) {
+                contactoBtn.addEventListener('click', function () {
+                    const destinatario = 'geoplanner.contact@gmail.com';
+                    const asunto = encodeURIComponent('Ayuda desde GeoPlanner');
+                    const cuerpo = encodeURIComponent('Describe aqui tu problema...');
+                    const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${destinatario}&su=${asunto}&body=${cuerpo}`;
+                    window.open(url, '_blank');
+                });
+            }
+            
 
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        
-        // --- LÓGICA PARA LOS MAPAS DE EJEMPLO ---
-        const map1 = L.map('map1').setView([10.659, -71.611], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map1);
-        L.marker([10.659, -71.611]).addTo(map1);
+            // --- GLOBAL VARIABLES & CONSTANTS ---
+            const STORAGE_KEY_POSTS = 'geoplanner_posts';
+            const STORAGE_KEY_AGENDA = 'geoplanner_agenda_';
+            const STORAGE_KEY_SAVED = 'geoplanner_saved_';
+            let currentUser = JSON.parse(sessionStorage.getItem('currentUser')) || {};
+            const USER_ID = currentUser.nombreUsuario || 'invitado';
 
-        const map2 = L.map('map2').setView([10.661, -71.618], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map2);
-        L.marker([10.661, -71.618]).addTo(map2);
-    
-        // --- LÓGICA PARA LOS MENÚS DESPLEGABLES ---
-        const dropdownIcons = {
-            'requests-icon': 'requests-dropdown',
-            'notifications-icon': 'notifications-dropdown',
-            'profile-icon': 'profile-dropdown'
-        };
+            let mainMap, selectionMap, selectionPolyline;
+            let selectionRoutingControl = null;
+            let selectedMarkers = [];
+            let routeType = 'simple';
+            let currentView = 'map';
+            let allPosts = [];
+            let agendaItems = [];
+            let savedEvents = [];
+            let currentMapStyle = 'openstreetmap';
+            let currentTileLayer = null;
+            let userRegistrations = [];
 
-        const closeAllDropdowns = () => {
-            Object.values(dropdownIcons).forEach(dropdownId => {
-                const dropdown = document.getElementById(dropdownId);
-                if (dropdown) dropdown.classList.remove('show');
-            });
-        };
 
-        Object.keys(dropdownIcons).forEach(iconId => {
-            const icon = document.getElementById(iconId);
-            const dropdown = document.getElementById(dropdownIcons[iconId]);
-            if (icon && dropdown) {
-                icon.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                    const isCurrentlyShown = dropdown.classList.contains('show');
-                    closeAllDropdowns();
-                    if (!isCurrentlyShown) {
-                        dropdown.classList.add('show');
+            // NUEVAS VARIABLES PARA FUNCIONALIDADES AGREGADAS
+            let userLocationMarker = null;
+            let userLocation = null;
+            let routingControl = null;
+
+            // --- TÉRMINOS Y CONDICIONES PREDETERMINADOS ---
+            const DEFAULT_GEOPLANNER_TERMS = `TÉRMINOS Y CONDICIONES DE GEOPLANNER
+
+1. Responsabilidad Exclusiva del Organizador:
+   Usted es el único responsable de la legalidad, seguridad (permisos, control de multitudes, etc.) y contenido de su evento.
+
+2. Deslinde de GeoPlanner:
+   GeoPlanner es solo una plataforma tecnológica y no se hace responsable por ningún incidente, daño o consecuencia legal relacionada con el evento.
+
+3. Prohibiciones Estrictas:
+   Se prohíben terminantemente eventos con actividades ilegales, armas, sustancias ilícitas, violencia o discursos de odio.
+
+4. Cooperación con Autoridades:
+   Al publicar, confirma que su identidad fue verificada y acepta que su información puede ser compartida con las autoridades si se detecta alguna ilegalidad.
+
+5. Verificación de Identidad:
+   Usted declara que ha proporcionado información veraz y que su identidad ha sido verificada por la plataforma.
+
+⚠️ Al publicar, declara que ha leído y aceptado estos términos en su totalidad.`;
+
+            // --- CENTRAR MAPA EN UBICACIÓN DEL USUARIO ---
+            const centerMapBtn = document.getElementById('center-map-btn');
+            if (centerMapBtn) {
+                centerMapBtn.addEventListener('click', function () {
+                    if (mainMap && userLocation) {
+                        mainMap.setView([userLocation.lat, userLocation.lng], mainMap.getZoom(), { animate: true });
+                    } else {
+                        alert('Ubicación de usuario no disponible.');
                     }
                 });
             }
-        });
 
-        window.addEventListener('click', () => closeAllDropdowns());
-        
-        const logoutButton = document.getElementById('logout-button');
-        if(logoutButton) {
-            logoutButton.addEventListener('click', () => alert("Cerrando sesión..."));
-        }
+            const createPostModal = new bootstrap.Modal(document.getElementById('create-post-modal'));
+            const agendaModal = new bootstrap.Modal(document.getElementById('agenda-modal'));
+            const savedEventsModal = new bootstrap.Modal(document.getElementById('saved-events-modal'));
 
-        // --- LÓGICA PARA EL MAPA DE CREAR PUBLICACIÓN ---
-        const mapModalEl = document.getElementById('map-modal');
-        const acceptLocationButton = document.getElementById('accept-location-button');
-        const clearMapButton = document.getElementById('clear-map-button');
-        const publishButton = document.getElementById('publish-button');
-        const locationDisplay = document.getElementById('location-display');
-        const postMapPreviewContainer = document.getElementById('post-map-preview-container');
-        
-        let modalMap, postPreviewMap;
-        let routeType = 'simple';
-        let markers = [];
-        let polyline = null;
-        
-        const geoPlannerIcon = L.icon({
-            iconUrl: 'img/LogoMini.png',
-            iconSize: [40, 40],
-            iconAnchor: [20, 40],
-        });
+            const mapStyles = {
+                openstreetmap: {
+                    name: 'OpenStreetMap',
+                    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    attribution: '© OpenStreetMap contributors'
+                },
+                satellite: {
+                    name: 'Vista Satelital',
+                    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                    attribution: '© Esri'
+                },
+                hybrid_esri: {
+                    name: 'Satélite con Calles (Esri)',
+                    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                    attribution: '© Esri',
+                }
+            };
 
-        mapModalEl.addEventListener('shown.bs.modal', function () {
-            if (!modalMap) {
-                modalMap = L.map('modal-map-container').setView([10.654, -71.612], 13);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(modalMap);
-                modalMap.on('click', onMapClick);
-            }
-            setTimeout(() => modalMap.invalidateSize(), 10);
-        });
+            // --- FUNCIONES PARA TÉRMINOS Y CONDICIONES ---
+            function initTermsAndConditions() {
+                const termsCheckbox = document.getElementById('accept-geoplanner-terms');
+                const termsContainer = document.getElementById('terms-checkbox-container');
+                const toggleBtn = document.getElementById('toggle-terms-btn');
+                const termsCollapse = document.getElementById('terms-collapse');
 
-        document.getElementById('simple-route-tab').addEventListener('click', () => {
-            routeType = 'simple';
-            clearMap();
-        });
-        document.getElementById('multiple-route-tab').addEventListener('click', () => {
-            routeType = 'multiple';
-            clearMap();
-        });
-        
-        const onMapClick = (e) => {
-            if (routeType === 'simple' && markers.length > 0) clearMap();
-            const newMarker = L.marker(e.latlng, { icon: geoPlannerIcon }).addTo(modalMap);
-            markers.push(newMarker);
-            if (routeType === 'multiple' && markers.length > 1) {
-                if(polyline) modalMap.removeLayer(polyline);
-                polyline = L.polyline(markers.map(m => m.getLatLng()), {color: '#007BFF'}).addTo(modalMap);
-            }
-        };
-        
-        const clearMap = () => {
-            markers.forEach(m => modalMap.removeLayer(m));
-            markers = [];
-            if (polyline) {
-                modalMap.removeLayer(polyline);
-                polyline = null;
-            }
-        };
-        
-        clearMapButton.addEventListener('click', clearMap);
+                // Manejar validación del checkbox
+                termsCheckbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        termsContainer.classList.add('valid');
+                        termsContainer.classList.remove('required-checkbox');
+                    } else {
+                        termsContainer.classList.remove('valid');
+                        termsContainer.classList.add('required-checkbox');
+                    }
+                });
 
-        acceptLocationButton.addEventListener('click', function() {
-            if (markers.length === 0) return;
+                // Manejar toggle de términos
+                toggleBtn.addEventListener('click', function() {
+                    const collapseInstance = new bootstrap.Collapse(termsCollapse, {
+                        toggle: true
+                    });
+                    
+                    const icon = this.querySelector('i');
+                    if (termsCollapse.classList.contains('show')) {
+                        icon.className = 'bi bi-chevron-down';
+                        this.innerHTML = '<i class="bi bi-chevron-down"></i> Ver términos completos';
+                    } else {
+                        icon.className = 'bi bi-chevron-up';
+                        this.innerHTML = '<i class="bi bi-chevron-up"></i> Ocultar términos';
+                    }
+                });
 
-            const latlngs = markers.map(m => m.getLatLng());
-            locationDisplay.textContent = routeType === 'simple'
-                ? `Ubicación: [${latlngs[0].lat.toFixed(4)}, ${latlngs[0].lng.toFixed(4)}]`
-                : `Ruta Múltiple (${markers.length} puntos)`;
+                // Evento para el collapse
+                termsCollapse.addEventListener('shown.bs.collapse', function() {
+                    const icon = toggleBtn.querySelector('i');
+                    icon.className = 'bi bi-chevron-up';
+                    toggleBtn.innerHTML = '<i class="bi bi-chevron-up"></i> Ocultar términos';
+                });
 
-            postMapPreviewContainer.style.height = '200px';
-            if (!postPreviewMap) {
-                postPreviewMap = L.map('post-map-preview-container', { zoomControl: false, scrollWheelZoom: false, dragging: false });
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(postPreviewMap);
-            } else {
-                 postPreviewMap.eachLayer(layer => {
-                    if (layer instanceof L.Marker || layer instanceof L.Polyline) postPreviewMap.removeLayer(layer);
+                termsCollapse.addEventListener('hidden.bs.collapse', function() {
+                    const icon = toggleBtn.querySelector('i');
+                    icon.className = 'bi bi-chevron-down';
+                    toggleBtn.innerHTML = '<i class="bi bi-chevron-down"></i> Ver términos completos';
                 });
             }
-            
-            latlngs.forEach(latlng => L.marker(latlng, { icon: geoPlannerIcon }).addTo(postPreviewMap));
-            if (polyline) {
-                 L.polyline(latlngs, {color: '#007BFF'}).addTo(postPreviewMap);
-            }
-            
-            const bounds = L.latLngBounds(latlngs);
-            postPreviewMap.fitBounds(bounds, { padding: [40, 40] }); // Agrega un margen de 40px
 
-            publishButton.disabled = false;
-            bootstrap.Modal.getInstance(mapModalEl).hide();
+            function validateTermsAcceptance() {
+                const termsCheckbox = document.getElementById('accept-geoplanner-terms');
+                if (!termsCheckbox.checked) {
+                    alert('Debes aceptar los Términos y Condiciones de GeoPlanner para poder publicar.');
+                    termsCheckbox.focus();
+                    return false;
+                }
+                return true;
+            }
+
+            // --- THEME LOGIC ---
+            const temas = {
+                default: {
+                    headerBG: "linear-gradient(145deg, #007BFF, #003366)",
+                    headerText: "white",
+                    bodyBG: "#f0f2f5",
+                    sidebarBG: "linear-gradient(145deg, #007BFF, #003366)",
+                    sidebarText: "white",
+                    cardBG: "#ffffff",
+                    cardText: "#333",
+                    btnPrimaryBG: "#00bfff"
+                },
+                aurora: {
+                    headerBG: "linear-gradient(145deg, #F8CDDA, #1D2B64)",
+                    headerText: "#FFFFFF",
+                    bodyBG: "#fdeff2",
+                    sidebarBG: "linear-gradient(145deg, #F8CDDA, #1D2B64)",
+                    sidebarText: "#FFFFFF",
+                    cardBG: "#ffffff",
+                    cardText: "#1D2B64",
+                    btnPrimaryBG: "#1D2B64"
+                },
+                noche: {
+                    headerBG: "linear-gradient(145deg, #141E30, #243B55)",
+                    headerText: "white",
+                    bodyBG: "#0f172a",
+                    sidebarBG: "linear-gradient(145deg, #141E30, #243B55)",
+                    sidebarText: "white",
+                    cardBG: "#1e293b",
+                    cardText: "#e2e8f0",
+                    btnPrimaryBG: "#38bdf8"
+                },
+                oceano: {
+                    headerBG: "linear-gradient(145deg, #2C3E50, #4CA1AF)",
+                    headerText: "white",
+                    bodyBG: "#eef6f7",
+                    sidebarBG: "linear-gradient(145deg, #2C3E50, #4CA1AF)",
+                    sidebarText: "white",
+                    cardBG: "#ffffff",
+                    cardText: "#2C3E50",
+                    btnPrimaryBG: "#4CA1AF"
+                },
+                amanecer: {
+                    headerBG: "linear-gradient(145deg, #FF512F, #F09819)",
+                    headerText: "white",
+                    bodyBG: "#fff8f2",
+                    sidebarBG: "linear-gradient(145deg, #FF512F, #F09819)",
+                    sidebarText: "white",
+                    cardBG: "#ffffff",
+                    cardText: "#5c2a07",
+                    btnPrimaryBG: "#FF512F"
+                },
+                pastel: {
+                    headerBG: "linear-gradient(145deg, #A1C4FD, #C2E9FB)",
+                    headerText: "#003366",
+                    bodyBG: "#f5f9ff",
+                    sidebarBG: "linear-gradient(145deg, #A1C4FD, #C2E9FB)",
+                    sidebarText: "#003366",
+                    cardBG: "#ffffff",
+                    cardText: "#333",
+                    btnPrimaryBG: "#A1C4FD"
+                },
+                fuego: {
+                    headerBG: "linear-gradient(145deg, #CB356B, #BD3F32)",
+                    headerText: "white",
+                    bodyBG: "#f9f2f3",
+                    sidebarBG: "linear-gradient(145deg, #CB356B, #BD3F32)",
+                    sidebarText: "white",
+                    cardBG: "#ffffff",
+                    cardText: "#4d1024",
+                    btnPrimaryBG: "#CB356B"
+                },
+                bosque: {
+                    headerBG: "linear-gradient(145deg, #11998E, #38EF7D)",
+                    headerText: "white",
+                    bodyBG: "#f2fcf8",
+                    sidebarBG: "linear-gradient(145deg, #11998E, #38EF7D)",
+                    sidebarText: "white",
+                    cardBG: "#ffffff",
+                    cardText: "#043d38",
+                    btnPrimaryBG: "#11998E"
+                },
+                lluvia: {
+                    headerBG: "linear-gradient(145deg, #396afc, #2948ff)",
+                    headerText: "white",
+                    bodyBG: "#f0f2ff",
+                    sidebarBG: "linear-gradient(145deg, #396afc, #2948ff)",
+                    sidebarText: "white",
+                    cardBG: "#ffffff",
+                    cardText: "#192d8b",
+                    btnPrimaryBG: "#396afc"
+                }
+            };
+
+            // 2. Función para aplicar el tema
+            function applyTheme(themeName) {
+                const root = document.documentElement;
+                const theme = temas[themeName] || temas.noche;
+
+                root.style.setProperty('--header-bg', theme.headerBG);
+                root.style.setProperty('--header-text-color', theme.headerText);
+                root.style.setProperty('--header-icon-bg', theme.headerIconBG);
+                root.style.setProperty('--header-icon-hover-bg', `rgba(255, 255, 255, 0.25)`);
+
+                root.style.setProperty('--body-bg', theme.bodyBG);
+
+                root.style.setProperty('--sidebar-bg', theme.sidebarBG);
+                root.style.setProperty('--sidebar-text-color', theme.sidebarText);
+                root.style.setProperty('--sidebar-hover-bg', `rgba(255, 255, 255, 0.15)`);
+
+                root.style.setProperty('--card-bg', theme.cardBG);
+                root.style.setProperty('--card-text-color', theme.cardText);
+
+                root.style.setProperty('--btn-primary-bg', theme.btnPrimaryBG);
+                root.style.setProperty('--btn-primary-text', theme.headerText);
+
+                // Scrollbar color según el tema
+                let scrollbarThumb = theme.btnPrimaryBG || '#007BFF';
+                let scrollbarTrack = '#e0e0e0';
+                if (themeName === 'noche') {
+                    scrollbarTrack = '#222c3a';
+                } else {
+                    scrollbarTrack = '#FFFFFF';
+                }
+                root.style.setProperty('--scrollbar-thumb', scrollbarThumb);
+                root.style.setProperty('--scrollbar-track', scrollbarTrack);
+                // Botón de búsqueda cambia con el tema
+                root.style.setProperty('--btn-primary-bg', theme.btnPrimaryBG);
+                root.style.setProperty('--btn-primary-text', theme.headerText);
+
+                document.querySelectorAll('.theme-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.theme === themeName) {
+                        item.classList.add('active');
+                    }
+                });
+
+                // Cambiar color del input de crear post según el tema
+                const createPostInput = document.querySelector('.create-post-widget-input');
+                if (createPostInput) {
+                    if (themeName === 'noche') {
+                        createPostInput.style.color = '#fff';
+                    } else {
+                        createPostInput.style.color = '';
+                    }
+                }
+
+                localStorage.setItem('geoPlannerTema', themeName);
+            }
+
+            // FUNCIONES PARA UBICACIÓN DEL USUARIO Y CÁLCULO DE DISTANCIA
+
+            function createUserLocationIcon(zoomLevel) {
+                let iconSize = Math.max(20, Math.min(50, zoomLevel * 3));
+
+                return L.divIcon({
+                    html: `<img src="img/LogoMini.png" style="width: ${iconSize}px; height: ${iconSize}px; border-radius: 50%; border: 3px solid #007BFF; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);" alt="Tu ubicación">`,
+                    className: 'user-location-marker',
+                    iconSize: [iconSize, iconSize],
+                    iconAnchor: [iconSize / 2, iconSize / 2]
+                });
+            }
+
+            function getUserLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function (position) {
+                            userLocation = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
+                            addUserLocationToMap();
+                        },
+                        function (error) {
+                            console.warn('No se pudo obtener la ubicación del usuario:', error);
+                            userLocation = {
+                                lat: 10.654,
+                                lng: -71.612
+                            };
+                            addUserLocationToMap();
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 300000
+                        }
+                    );
+                } else {
+                    console.warn('Geolocalización no soportada por este navegador');
+                    userLocation = {
+                        lat: 10.654,
+                        lng: -71.612
+                    };
+                    addUserLocationToMap();
+                }
+            }
+
+            function addUserLocationToMap() {
+                if (!mainMap || !userLocation) return;
+
+                if (userLocationMarker) {
+                    mainMap.removeLayer(userLocationMarker);
+                }
+
+                const currentZoom = mainMap.getZoom();
+                userLocationMarker = L.marker([userLocation.lat, userLocation.lng], {
+                    icon: createUserLocationIcon(currentZoom)
+                }).addTo(mainMap);
+
+                userLocationMarker.bindPopup('<b>Tu ubicación actual</b><br>¡Aquí estás tú!');
+
+                mainMap.on('zoomend', function () {
+                    if (userLocationMarker) {
+                        const newZoom = mainMap.getZoom();
+                        userLocationMarker.setIcon(createUserLocationIcon(newZoom));
+                    }
+                });
+            }
+
+            function calculateDistance(lat1, lng1, lat2, lng2) {
+                const R = 6371;
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLng = (lng2 - lng1) * Math.PI / 180;
+                const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                const distance = R * c;
+                return distance;
+            }
+
+            function formatDistance(distanceKm) {
+                if (distanceKm < 1) {
+                    return `${Math.round(distanceKm * 1000)} metros`;
+                } else if (distanceKm < 10) {
+                    return `${distanceKm.toFixed(1)} km`;
+                } else {
+                    return `${Math.round(distanceKm)} km`;
+                }
+            }
+
+            let currentOverlayLayer = null;
+
+            function changeMapStyle(styleName) {
+                if (!mapStyles[styleName]) return;
+                currentMapStyle = styleName;
+                const style = mapStyles[styleName];
+
+                if (mainMap && currentTileLayer) {
+                    mainMap.removeLayer(currentTileLayer);
+                }
+                if (mainMap && currentOverlayLayer) {
+                    mainMap.removeLayer(currentOverlayLayer);
+                    currentOverlayLayer = null;
+                }
+                if (selectionMap) {
+                    selectionMap.eachLayer(layer => {
+                        if (layer instanceof L.TileLayer) {
+                            selectionMap.removeLayer(layer);
+                        }
+                    });
+                }
+
+                currentTileLayer = L.tileLayer(style.url, { attribution: style.attribution });
+                if (mainMap) {
+                    currentTileLayer.addTo(mainMap);
+                }
+                if (selectionMap) {
+                    L.tileLayer(style.url, { attribution: style.attribution }).addTo(selectionMap);
+                }
+
+                if (styleName === 'hybrid_esri') {
+                    currentOverlayLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, TomTom, OpenStreetMap contributors',
+                        pane: 'overlayPane'
+                    });
+                    if (mainMap) {
+                        currentOverlayLayer.addTo(mainMap);
+                        currentOverlayLayer.setZIndex(10);
+                    }
+                    if (selectionMap) {
+                        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+                            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, TomTom, OpenStreetMap contributors',
+                            pane: 'overlayPane'
+                        }).addTo(selectionMap).setZIndex(10);
+                    }
+                }
+
+                document.querySelectorAll('.map-style-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.style === styleName) {
+                        item.classList.add('active');
+                    }
+                });
+
+                localStorage.setItem('geoplanner_map_style', styleName);
+            }
+
+            // --- DATA INITIALIZATION & MANAGEMENT ---
+            function initData() {
+                const nombre = localStorage.getItem("geoPlannerNombre") || "Usuario";
+                const apellido = localStorage.getItem("geoPlannerApellido") || "";
+                const foto = localStorage.getItem("geoPlannerFotoPerfil");
+                const tema = localStorage.getItem("geoPlannerTema") || "default";
+
+                currentUser.nombre = `${nombre} ${apellido}`.trim();
+                currentUser.foto = foto;
+
+                document.querySelector('.nombre-usuario').textContent = currentUser.nombre;
+                document.querySelector('.nombre-usuario-short').textContent = nombre.split(' ')[0];
+
+                if (foto) {
+                    document.querySelectorAll(".foto-usuario").forEach(el => {
+                        el.src = foto;
+                    });
+                }
+
+                const savedMapStyle = localStorage.getItem('geoplanner_map_style') || 'openstreetmap';
+                currentMapStyle = savedMapStyle;
+
+                // Actualizar posts de ejemplo con nueva estructura de términos
+                const examplePosts = [{
+                    id: 'post_1',
+                    author: 'ana_gomez',
+                    verified: true,
+                    text: '¡Mañana de senderismo en la montaña! Salimos a las 7 AM.',
+                    privacidad: 'publica',
+                    mediaURL: 'https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=2070',
+                    type: 'Deporte',
+                    eventDate: '2025-07-15T07:00:00',
+                    likes: 15,
+                    likers: [],
+                    comentarios: [{
+                        author: 'carlos_ruiz',
+                        text: '¡Allá nos vemos!'
+                    }],
+                    rutas: [{
+                        coords: '10.72,-71.65',
+                        label: 'Entrada principal'
+                    }],
+                    terms: {
+                        geoplanner: DEFAULT_GEOPLANNER_TERMS,
+                        additional: ''
+                    }
+                }, {
+                    id: 'post_8',
+                    author: 'juan_sarcos',
+                    verified: true,
+                    text: '¡Vamos al cine a ver el estreno del verano!',
+                    privacidad: 'amigos',
+                    mediaURL: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1975',
+                    type: 'Social',
+                    eventDate: '2025-08-02T20:00:00',
+                    likes: 9,
+                    likers: [USER_ID],
+                    comentarios: [],
+                    rutas: [{
+                        coords: '10.69,-71.63',
+                        label: 'Cinex Galerías'
+                    }],
+                    terms: {
+                        geoplanner: DEFAULT_GEOPLANNER_TERMS,
+                        additional: 'Comprar entradas con antelación. Ser puntuales por favor.'
+                    }
+                }];
+
+                if (!localStorage.getItem(STORAGE_KEY_POSTS)) {
+                    localStorage.setItem(STORAGE_KEY_POSTS, JSON.stringify(examplePosts));
+                }
+                allPosts = JSON.parse(localStorage.getItem(STORAGE_KEY_POSTS));
+                agendaItems = JSON.parse(localStorage.getItem(STORAGE_KEY_AGENDA + USER_ID)) || [];
+                savedEvents = JSON.parse(localStorage.getItem(STORAGE_KEY_SAVED + USER_ID)) || [];
+                userRegistrations = JSON.parse(localStorage.getItem('geoplanner_registrations_' + USER_ID)) || [];
+
+                applyTheme(tema);
+            }
+
+            // --- VIEW MANAGEMENT & RENDERING ---
+            function toggleView() {
+                currentView = (currentView === 'map') ? 'classic' : 'map';
+                document.getElementById('view-toggle-btn').textContent = currentView === 'map' ? 'Ver Feed Clásico' : 'Ver Vista de Mapa';
+                document.getElementById('map-view-container').style.display = currentView === 'map' ? 'flex' : 'none';
+                document.getElementById('classic-feed-container').style.display = currentView === 'classic' ? 'flex' : 'none';
+                if (currentView === 'map') {
+                    mainMap.invalidateSize();
+                } else {
+                    // Limpiar el sidebar down al pasar al feed clásico
+                    const sidebarDown = document.querySelector('.left-sidebar-down ul');
+                    if (sidebarDown) {
+                        sidebarDown.innerHTML = '';
+                    }
+                    renderClassicFeed();
+                }
+            }
+
+            // Filtro de tipo de evento usando left-sidebar-down
+            let classicFeedFilterType = 'all';
+            function renderClassicFeed() {
+                const feedContent = document.getElementById('classic-feed-content');
+                feedContent.innerHTML = '';
+                let filteredPosts = allPosts;
+                if (classicFeedFilterType !== 'all') {
+                    filteredPosts = allPosts.filter(post => post.type === classicFeedFilterType);
+                }
+                filteredPosts
+                    .sort((a, b) => new Date(b.eventDate) - new Date(a.eventDate))
+                    .forEach(post => feedContent.appendChild(renderPost(post)));
+            }
+
+            function renderPost(post) {
+                if (!post.inscritos) post.inscritos = [];
+                const container = document.createElement('div');
+                container.className = 'post';
+
+                const privacyBadge = {
+                    publica: '🔓 Pública',
+                    amigos: '👥 Amigos',
+                    privada: '🔒 Privada'
+                }[post.privacidad] || '🔓 Pública';
+                const isLiked = post.likers.includes(USER_ID);
+                const isSaved = savedEvents.includes(post.id);
+                const verifiedIcon = `<svg class="geoplanner-verified-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm5.71,7.29-6,6a1,1,0,0,1-1.42,0l-3-3a1,1,0,0,1,1.42-1.42L11,13.59l5.29-5.3a1,1,0,0,1,1.42,1.42Z"/></svg>`;
+                const saveStarIcon = `<svg class="save-star-icon ${isSaved ? 'saved' : ''}" data-post-id="${post.id}" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+
+                const isOwner = post.author === USER_ID;
+                const now = new Date();
+                const eventDate = new Date(post.eventDate);
+                let actionButton = '';
+                const yaInscrito = (userRegistrations && userRegistrations.some(reg => reg.postId === post.id)) || (post.inscritos && post.inscritos.some(u => u.userId === USER_ID));
+                if (isOwner) {
+                    if (eventDate > now) {
+                        actionButton = `<button class="btn btn-sm btn-warning btn-ver-inscritos" data-post-id="${post.id}">Ver Inscritos</button>`;
+                    } else {
+                        actionButton = `<button class="btn btn-sm btn-success btn-verificar-asistentes" data-post-id="${post.id}">Verificar Asistentes</button>`;
+                    }
+                } else {
+                    if (yaInscrito) {
+                        actionButton = `<button class="btn btn-sm" style="background:#FFD600;color:#222;font-weight:bold;pointer-events:none;cursor:default;" disabled data-post-id="${post.id}">Ya estás inscrito al evento</button>`;
+                    } else {
+                        actionButton = `<button class="btn btn-sm btn-primary btn-inscribirse" data-post-id="${post.id}">Inscribirse</button>`;
+                    }
+                }
+
+                container.innerHTML = `
+                    <div class="post-header">
+                        <strong>${post.author}</strong>
+                        ${post.verified ? verifiedIcon : ''}
+                        <span class="badge bg-secondary">${privacyBadge}</span>
+                        ${saveStarIcon}
+                    </div>
+                    <p>${post.text}</p>
+                    ${post.mediaURL ? `<img src="${post.mediaURL}" alt="Media" class="img-fluid rounded mb-2" onerror="this.style.display='none'">` : ''}
+                    <div class="map-container mb-2" id="map-${post.id}"></div>
+                    ${post.rutas.length > 1 ? `<ol class="list-group list-group-flush list-group-numbered mb-2 small">${post.rutas.map(r => `<li class="list-group-item">${r.label}</li>`).join('')}</ol>` : ''}
+                    <div class="d-flex gap-2 mt-2 flex-wrap">
+                        <button class="btn btn-sm btn-outline-danger btn-like" data-post-id="${post.id}">
+                            ${isLiked ? '💔 Quitar Like' : '❤️ Like'} (<span>${post.likes}</span>)
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#comentarios-${post.id}">
+                            💬 Comentarios (${post.comentarios.length})
+                        </button>
+                        <button class="btn btn-sm btn-outline-info btn-terms" data-post-id="${post.id}">
+                            📜 Ver Términos
+                        </button>
+                        ${actionButton}
+                    </div>
+                    <div class="comentarios mt-2 collapse" id="comentarios-${post.id}">
+                        <div class="comentarios-list mb-2 small">
+                            ${post.comentarios.map(c => `<div><strong>@${c.author}:</strong> ${c.text}</div>`).join('') || 'No hay comentarios.'}
+                        </div>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" placeholder="Escribe un comentario...">
+                            <button class="btn btn-sm btn-primary btn-comment" data-post-id="${post.id}">Enviar</button>
+                        </div>
+                    </div>
+                `;
+
+                if (isOwner) {
+                    container.innerHTML += `<button class="btn btn-sm btn-danger w-100 mt-2 btn-delete" data-post-id="${post.id}">🗑️ Eliminar Publicación</button>`;
+                }
+
+                setTimeout(() => {
+                    const mapElement = container.querySelector(`#map-${post.id}`);
+                    if (mapElement && !mapElement.classList.contains('leaflet-container')) {
+                        const latlngs = post.rutas.map(r => r.coords.split(',').map(Number));
+                        const postMap = L.map(mapElement, {
+                            zoomControl: false,
+                            scrollWheelZoom: false
+                        }).setView(latlngs[0], 13);
+
+                        const style = mapStyles[currentMapStyle];
+                        L.tileLayer(style.url, {
+                            attribution: style.attribution
+                        }).addTo(postMap);
+
+                        latlngs.forEach(latlng => {
+                            const eventIcon = L.divIcon({
+                                html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28"><path fill="#dc3545" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>`,
+                                className: 'public-event-marker',
+                                iconSize: [28, 28],
+                                iconAnchor: [14, 28],
+                                popupAnchor: [0, -28],
+                            });
+                            L.marker(latlng, { icon: eventIcon }).addTo(postMap);
+                        });
+
+                        if (userLocation) {
+                            const userIcon = createUserLocationIcon(13);
+                            L.marker([userLocation.lat, userLocation.lng], {
+                                icon: userIcon
+                            }).addTo(postMap).bindPopup('Tu ubicación');
+                        }
+
+                        if (latlngs.length > 1) {
+                            const polyline = L.polyline(latlngs, {
+                                color: '#007BFF'
+                            }).addTo(postMap);
+                            postMap.fitBounds(polyline.getBounds(), {
+                                padding: [20, 20]
+                            });
+                        } else {
+                            postMap.setView(latlngs[0], 15);
+                        }
+                    }
+                }, 0);
+                return container;
+            }
+
+            function renderSavedPost(post) {
+                const container = document.createElement('div');
+                container.className = 'post';
+                container.innerHTML = `
+                    <p>${post.text}</p>
+                    <div class="map-container mb-2" id="map-saved-${post.id}"></div>
+                `;
+                setTimeout(() => {
+                    const mapElement = container.querySelector(`#map-saved-${post.id}`);
+                    if (mapElement && !mapElement.classList.contains('leaflet-container')) {
+                        const latlngs = post.rutas.map(r => r.coords.split(',').map(Number));
+                        const postMap = L.map(mapElement, {
+                            zoomControl: false,
+                            scrollWheelZoom: false
+                        }).setView(latlngs[0], 13);
+
+                        const style = mapStyles[currentMapStyle];
+                        L.tileLayer(style.url, {
+                            attribution: style.attribution
+                        }).addTo(postMap);
+
+                        latlngs.forEach(latlng => {
+                            const eventIcon = L.divIcon({
+                                html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28"><path fill="#dc3545" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>`,
+                                className: 'public-event-marker',
+                                iconSize: [28, 28],
+                                iconAnchor: [14, 28]
+                            });
+                            L.marker(latlng, { icon: eventIcon }).addTo(postMap);
+                        });
+
+                        if (userLocation) {
+                            const userIcon = createUserLocationIcon(13);
+                            L.marker([userLocation.lat, userLocation.lng], {
+                                icon: userIcon
+                            }).addTo(postMap).bindPopup('Tu ubicación');
+                        }
+
+                        if (latlngs.length > 1) {
+                            const polyline = L.polyline(latlngs, {
+                                color: '#007BFF'
+                            }).addTo(postMap);
+                            postMap.fitBounds(polyline.getBounds(), {
+                                padding: [20, 20]
+                            });
+                        } else {
+                            postMap.setView(latlngs[0], 15);
+                        }
+                    }
+                }, 0);
+                return container;
+            }
+
+            function refreshUI() {
+                renderClassicFeed();
+                renderMapMarkers(document.getElementById('map-filter-type').value);
+            }
+
+            // --- INTERACTION LOGIC ---
+            // Filtro de tipo de evento para el feed clásico usando left-sidebar-down
+            function setupClassicFeedSidebarFilter() {
+                const sidebar = document.getElementById('map-filter-type');
+                if (!sidebar) return;
+                sidebar.querySelectorAll('li').forEach(li => {
+                    li.addEventListener('click', function() {
+                        // Determinar tipo
+                        const typeMap = {
+                            '1': 'all',
+                            '2': 'Deporte',
+                            '3': 'Estudio',
+                            '4': 'Social',
+                            '5': 'Cultural',
+                            '6': 'Otro'
+                        };
+                        classicFeedFilterType = typeMap[this.id] || 'all';
+                        // Remover clase activa de todos y poner solo al seleccionado
+                        sidebar.querySelectorAll('li').forEach(item => item.classList.remove('active'));
+                        this.classList.add('active');
+                        // Siempre renderizar el feed clásico si está visible
+                        if (document.getElementById('classic-feed-container').style.display !== 'none') {
+                            renderClassicFeed();
+                        }
+                    });
+                });
+            }
+
+            // Llamar al setup al cargar
+            document.addEventListener('DOMContentLoaded', function() {
+                setupClassicFeedSidebarFilter();
+            });
+            function toggleLike(postId) {
+                const post = allPosts.find(p => p.id === postId);
+                if (!post) return;
+                const userIndex = post.likers.indexOf(USER_ID);
+                if (userIndex > -1) {
+                    post.likers.splice(userIndex, 1);
+                    post.likes--;
+                } else {
+                    post.likers.push(USER_ID);
+                    post.likes++;
+                }
+                localStorage.setItem(STORAGE_KEY_POSTS, JSON.stringify(allPosts));
+                refreshUI();
+            }
+
+            function addComment(postId, text) {
+                const post = allPosts.find(p => p.id === postId);
+                if (post && text) {
+                    post.comentarios.push({
+                        author: USER_ID,
+                        text: text
+                    });
+                    localStorage.setItem(STORAGE_KEY_POSTS, JSON.stringify(allPosts));
+                    refreshUI();
+                }
+            }
+
+            function eliminarPost(postId) {
+                allPosts = allPosts.filter(p => p.id !== postId);
+                localStorage.setItem(STORAGE_KEY_POSTS, JSON.stringify(allPosts));
+                refreshUI();
+            }
+
+            function toggleSaveEvent(postId) {
+                const index = savedEvents.indexOf(postId);
+                if (index > -1) {
+                    savedEvents.splice(index, 1);
+                } else {
+                    savedEvents.push(postId);
+                }
+                localStorage.setItem(STORAGE_KEY_SAVED + USER_ID, JSON.stringify(savedEvents));
+                refreshUI();
+            }
+
+            function handleSubscription(postId) {
+                const post = allPosts.find(p => p.id === postId);
+                if (!post) return;
+                if (!post.inscritos) post.inscritos = [];
+                if (userRegistrations.some(reg => reg.postId === postId)) {
+                    alert('Ya estás inscrito en este evento.');
+                    return;
+                }
+                if (post.inscritos.some(u => u.userId === USER_ID)) {
+                    alert('Ya estás inscrito en este evento.');
+                    return;
+                }
+                const confirmation = confirm('Al inscribirte, aceptas los términos y condiciones del evento. ¿Deseas continuar?');
+                if (confirmation) {
+                    const registration = {
+                        postId: post.id,
+                        title: post.text,
+                        author: post.author,
+                        eventDate: post.eventDate,
+                        registrationDate: new Date().toISOString(),
+                        userId: USER_ID
+                    };
+                    userRegistrations.push(registration);
+                    post.inscritos.push({ userId: USER_ID, nombre: currentUser.nombre || USER_ID });
+                    localStorage.setItem('geoplanner_registrations_' + USER_ID, JSON.stringify(userRegistrations));
+                    localStorage.setItem(STORAGE_KEY_POSTS, JSON.stringify(allPosts));
+                    alert('¡Inscripción exitosa!');
+                    refreshUI();
+                }
+            }
+
+            // --- MAPS & MODALS LOGIC ---
+            function initMainMap() {
+                mainMap = L.map('feed-map').setView([10.654, -71.612], 12);
+
+                const style = mapStyles[currentMapStyle];
+                currentTileLayer = L.tileLayer(style.url, {
+                    attribution: style.attribution
+                }).addTo(mainMap);
+
+                getUserLocation();
+            }
+
+            function markRouteOnMap(puntoInicio, puntoFinal) {
+                borrarRuta();
+                let waypoints = [];
+                if (Array.isArray(puntoInicio) && Array.isArray(puntoInicio[0])) {
+                    waypoints = puntoInicio.map(wp => L.latLng(wp[0], wp[1]));
+                } else {
+                    waypoints = [L.latLng(puntoInicio), L.latLng(puntoFinal)];
+                }
+                if (waypoints.length < 2) {
+                    console.log("Se necesitan al menos 2 puntos para trazar una ruta.");
+                    return;
+                }
+                routingControl = L.Routing.control({
+                    waypoints: waypoints,
+                    createMarker: function() { return null; },
+                }).addTo(mainMap);
+            }
+
+            function borrarRuta() {
+                if (routingControl) {
+                    mainMap.removeControl(routingControl);
+                    routingControl = null;
+                }
+                if (typeof selectionRoutingControl !== 'undefined' && selectionRoutingControl && selectionMap) {
+                    selectionMap.removeControl(selectionRoutingControl);
+                    selectionRoutingControl = null;
+                }
+            }
+
+            function renderMapMarkers(filterType = 'all') {
+                mainMap.eachLayer(layer => {
+                    if (layer instanceof L.Marker && layer !== userLocationMarker) {
+                        mainMap.removeLayer(layer);
+                    }
+                });
+
+                const publicPosts = allPosts.filter(post => post.privacidad === 'publica');
+                const filteredPosts = (filterType === 'all') ? publicPosts : publicPosts.filter(p => p.type === filterType);
+
+                filteredPosts.forEach(post => {
+                    if (post.rutas && post.rutas.length > 0) {
+                        const latlng = post.rutas[0].coords.split(',').map(Number);
+
+                        const icon = L.divIcon({
+                            html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32"><path fill="#dc3545" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>`,
+                            className: 'public-event-marker',
+                            iconSize: [32, 32],
+                            iconAnchor: [16, 32],
+                            popupAnchor: [0, -28]
+                        });
+
+                        const marker = L.marker(latlng, {
+                            icon
+                        }).addTo(mainMap);
+
+                        marker.on('mouseover', () => marker.bindPopup(`<b>${post.text.substring(0, 30)}...</b><br><small>Evento público</small>`).openPopup());
+                        marker.on('mouseout', () => marker.closePopup());
+                        marker.on('click', () => {
+                            let distanceInfo = '';
+                            if (userLocation) {
+                                const distance = calculateDistance(
+                                    userLocation.lat, userLocation.lng,
+                                    latlng[0], latlng[1]
+                                );
+                                markRouteOnMap(userLocation, latlng);
+                                distanceInfo = `<div class=\"mt-2 p-2 bg-info text-white rounded\"><strong>📍 Distancia desde tu ubicación:</strong><br>${formatDistance(distance)}</div>`;
+                            }
+
+                            const detailSidebar = document.getElementById('event-detail-sidebar');
+                            const closeBtn = `<button id=\"close-event-detail\" class=\"btn btn-sm btn-secondary mb-2\" style=\"float:right;\">✖</button>`;
+                            detailSidebar.innerHTML = closeBtn + `<div class=\"post\">${renderPost(post).innerHTML}${distanceInfo}</div>`;
+                            detailSidebar.classList.add('show');
+                            // Delegar eventos para los botones del sidebar
+                            detailSidebar.onclick = function(e) {
+                                const button = e.target.closest('button, .save-star-icon');
+                                if (!button) return;
+                                const postId = button.dataset.postId;
+                                if (!postId) return;
+                                let needsSidebarRefresh = false;
+                                if (button.classList.contains('btn-like')) {
+                                    toggleLike(postId);
+                                    needsSidebarRefresh = true;
+                                }
+                                if (button.classList.contains('btn-delete')) {
+                                    if (confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
+                                        eliminarPost(postId);
+                                        // Cerrar el sidebar si se elimina el post
+                                        detailSidebar.classList.remove('show');
+                                        borrarRuta();
+                                        detailSidebar.innerHTML = '';
+                                        return;
+                                    }
+                                }
+                                if (button.classList.contains('btn-comment')) {
+                                    const commentInput = button.previousElementSibling;
+                                    addComment(postId, commentInput.value);
+                                    commentInput.value = '';
+                                    needsSidebarRefresh = true;
+                                }
+                                if (button.classList.contains('btn-inscribirse')) {
+                                    handleSubscription(postId);
+                                    needsSidebarRefresh = true;
+                                }
+                                if (button.classList.contains('btn-ver-inscritos')) {
+                                    const post = allPosts.find(p => p.id === postId);
+                                    const lista = document.getElementById('lista-inscritos');
+                                    lista.innerHTML = post.inscritos.length ? post.inscritos.map(u => `<li class='list-group-item'><strong>${u.userId}</strong> - ${u.nombre}</li>`).join('') : '<li class="list-group-item">No hay inscritos.</li>';
+                                    new bootstrap.Modal(document.getElementById('modal-inscritos')).show();
+                                }
+                                if (button.classList.contains('btn-verificar-asistentes')) {
+                                    const simulados = [
+                                        { userId: 'USER001', nombre: 'Ana García', asistio: true },
+                                        { userId: 'USER002', nombre: 'Luis Pérez', asistio: true },
+                                        { userId: 'USER003', nombre: 'María López', asistio: false },
+                                        { userId: 'USER004', nombre: 'Juan Rodríguez', asistio: true },
+                                        { userId: 'USER005', nombre: 'Sofía Martínez', asistio: false },
+                                        { userId: 'USER006', nombre: 'Carlos Díaz', asistio: true },
+                                        { userId: 'USER007', nombre: 'Laura Sánchez', asistio: false },
+                                        { userId: 'USER008', nombre: 'Pedro Gómez', asistio: true },
+                                        { userId: 'USER009', nombre: 'Elena Fernández', asistio: false },
+                                        { userId: 'USER010', nombre: 'Diego Ruiz', asistio: true }
+                                    ];
+                                    const tabla = document.getElementById('tabla-asistencia');
+                                    tabla.innerHTML = simulados.map(u => `<tr><td>${u.userId}</td><td>${u.nombre}</td><td>${u.asistio ? 'Asistió ✅' : 'No asistió ❌'}</td></tr>`).join('');
+                                    new bootstrap.Modal(document.getElementById('modal-asistencia')).show();
+                                }
+                                if (button.classList.contains('btn-terms')) {
+                                    const post = allPosts.find(p => p.id === postId);
+                                    if (post && post.terms) {
+                                        let termsContent = post.terms.geoplanner || DEFAULT_GEOPLANNER_TERMS;
+                                        if (post.terms.additional && post.terms.additional.trim()) {
+                                            termsContent += '\n\n--- TÉRMINOS ADICIONALES DEL ORGANIZADOR ---\n\n' + post.terms.additional;
+                                        }
+                                        alert(termsContent);
+                                    }
+                                }
+                                if (button.classList.contains('save-star-icon')) {
+                                    toggleSaveEvent(postId);
+                                    needsSidebarRefresh = true;
+                                }
+                                // Si la acción requiere refrescar el sidebar, volver a renderizar el contenido
+                                if (needsSidebarRefresh) {
+                                    const post = allPosts.find(p => p.id === postId);
+                                    let distanceInfo = '';
+                                    if (userLocation && post && post.rutas && post.rutas.length > 0) {
+                                        const latlng = post.rutas[0].coords.split(',').map(Number);
+                                        const distance = calculateDistance(
+                                            userLocation.lat, userLocation.lng,
+                                            latlng[0], latlng[1]
+                                        );
+                                        distanceInfo = `<div class=\"mt-2 p-2 bg-info text-white rounded\"><strong>📍 Distancia desde tu ubicación:</strong><br>${formatDistance(distance)}</div>`;
+                                    }
+                                    const closeBtn = `<button id=\"close-event-detail\" class=\"btn btn-sm btn-secondary mb-2\" style=\"float:right;\">Cerrar ✖</button>`;
+                                    detailSidebar.innerHTML = closeBtn + `<div class=\"post\">${renderPost(post).innerHTML}${distanceInfo}</div>`;
+                                    detailSidebar.classList.add('show');
+                                }
+                            };
+                            let waypointMarkers = [];
+                            if (post.rutas.length > 1) {
+                                let allWaypoints = post.rutas.map(r => r.coords.split(',').map(Number));
+                                let routeWaypoints = allWaypoints;
+                                if (userLocation) {
+                                    routeWaypoints = [[userLocation.lat, userLocation.lng], ...allWaypoints];
+                                }
+                                markRouteOnMap(routeWaypoints);
+                                if (post.rutas.length !== 1) {
+                                    for (let i = 0; i < allWaypoints.length; i++) {
+                                        const wp = allWaypoints[i];
+                                        const marker = L.marker(wp, {
+                                            icon: L.divIcon({
+                                                className: 'waypoint-marker',
+                                                html: `<div style='background:#fff;border:2px solid #007BFF;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#007BFF;'>${i+1}</div>`,
+                                                iconSize: [18, 18],
+                                                iconAnchor: [9, 9]
+                                            })
+                                        }).addTo(mainMap);
+                                        waypointMarkers.push(marker);
+                                    }
+                                }
+                            } else if (post.rutas.length === 1) {
+                                let point = post.rutas[0].coords.split(',').map(Number);
+                                if (userLocation) {
+                                    let waypoints = [[userLocation.lat, userLocation.lng], point];
+                                    markRouteOnMap(waypoints);
+                                } else {
+                                    borrarRuta();
+                                    const marker = L.marker(point, {
+                                        icon: L.divIcon({
+                                            className: 'waypoint-marker',
+                                            html: `<div style='background:#fff;border:2px solid #007BFF;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#007BFF;'>1</div>`,
+                                            iconSize: [18, 18],
+                                            iconAnchor: [9, 9]
+                                        })
+                                    }).addTo(mainMap);
+                                    waypointMarkers.push(marker);
+                                }
+                            }
+                            document.getElementById('close-event-detail').onclick = () => {
+                                detailSidebar.classList.remove('show');
+                                borrarRuta();
+                                if (waypointMarkers && waypointMarkers.length) {
+                                    waypointMarkers.forEach(m => mainMap.removeLayer(m));
+                                    waypointMarkers = [];
+                                }
+                                detailSidebar.innerHTML = '';
+                            };
+                        });
+                    }
+                });
+            }
+
+            function renderAgenda() {
+                const list = document.getElementById('agenda-list');
+                list.innerHTML = agendaItems.length ? '' : '<p>No tienes actividades en tu agenda.</p>';
+                agendaItems
+                    .sort((a, b) => new Date(a.date) - new Date(b.date))
+                    .forEach(item => {
+                        const itemEl = document.createElement('div');
+                        itemEl.className = 'list-group-item';
+                        itemEl.innerHTML = `
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">${item.title}</h6>
+                                <small>${new Date(item.date).toLocaleDateString()}</small>
+                            </div>
+                            <p class="mb-1">${item.desc}</p>
+                            <div id="steps-${item.id}" class="mt-2"></div>
+                            <button class="btn btn-sm btn-outline-primary btn-suggest" data-item-id="${item.id}">Sugerir Pasos ✨</button>
+                            <button class="btn btn-sm btn-outline-danger float-end btn-delete-agenda" data-item-id="${item.id}">Eliminar</button>
+                        `;
+                        list.appendChild(itemEl);
+                    });
+            }
+
+            function renderSavedEvents() {
+                const container = document.getElementById('saved-events-list');
+                container.innerHTML = '';
+                const savedPosts = allPosts.filter(post => savedEvents.includes(post.id));
+                if (savedPosts.length === 0) {
+                    container.innerHTML = '<p class="p-3">No tienes eventos guardados.</p>';
+                } else {
+                    savedPosts.forEach(post => container.appendChild(renderSavedPost(post)));
+                }
+                savedEventsModal.show();
+            }
+
+            function savePost() {
+                const text = document.getElementById('post-text').value.trim();
+                if (!text || selectedMarkers.length === 0) {
+                    alert("El texto de la publicación y la ubicación son obligatorios.");
+                    return;
+                }
+
+                // Validar que se hayan aceptado los términos
+                if (!validateTermsAcceptance()) {
+                    return;
+                }
+
+                const additionalTerms = document.getElementById('additional-terms-textarea').value.trim();
+
+                const newPost = {
+                    id: 'post_' + Date.now(),
+                    author: USER_ID,
+                    verified: currentUser.verified || false,
+                    text: text,
+                    privacidad: document.getElementById('post-privacy').value,
+                    mediaURL: '',
+                    type: document.getElementById('post-type').value,
+                    eventDate: document.getElementById('post-date').value,
+                    status: 'vigente',
+                    likes: 0,
+                    likers: [],
+                    comentarios: [],
+                    rutas: selectedMarkers.map(marker => marker.getLatLng()).map((latlng, i) => {
+                        const rutaInputs = document.querySelectorAll('#ruta-inputs input');
+                        return {
+                            coords: `${latlng.lat},${latlng.lng}`,
+                            label: (rutaInputs[i] && rutaInputs[i].value.trim()) || `Punto ${i + 1}`
+                        };
+                    }),
+                    terms: {
+                        geoplanner: DEFAULT_GEOPLANNER_TERMS,
+                        additional: additionalTerms
+                    }
+                };
+
+                const file = document.getElementById('file-media').files[0];
+                const updateAndRefresh = (post) => {
+                    allPosts.unshift(post);
+                    localStorage.setItem(STORAGE_KEY_POSTS, JSON.stringify(allPosts));
+                    document.getElementById('create-post-form').reset();
+                    document.getElementById('location-display').textContent = 'No se ha seleccionado ninguna ubicación.';
+                    document.getElementById('accept-geoplanner-terms').checked = false;
+                    document.getElementById('terms-checkbox-container').classList.remove('valid');
+                    document.getElementById('terms-checkbox-container').classList.add('required-checkbox');
+                    selectedMarkers = [];
+                    createPostModal.hide();
+                    refreshUI();
+                };
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        newPost.mediaURL = e.target.result;
+                        updateAndRefresh(newPost);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    updateAndRefresh(newPost);
+                }
+            }
+
+            // --- MODALS FOR INSCRITOS & ASISTENCIA ---
+            if (!document.getElementById('modal-inscritos')) {
+                const modalInscritos = document.createElement('div');
+                modalInscritos.innerHTML = `
+                <div class="modal fade" id="modal-inscritos" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Inscritos al Evento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+                      <div class="modal-body">
+                        <ul id="lista-inscritos" class="list-group"></ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>`;
+                document.body.appendChild(modalInscritos);
+            }
+            if (!document.getElementById('modal-asistencia')) {
+                const modalAsistencia = document.createElement('div');
+                modalAsistencia.innerHTML = `
+                <div class="modal fade" id="modal-asistencia" tabindex="-1">
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Verificación de Asistencia</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+                      <div class="modal-body">
+                        <div style="max-height:400px;overflow-y:auto;">
+                          <table class="table table-bordered table-striped">
+                            <thead><tr><th>ID de Usuario</th><th>Nombre</th><th>Estado de Asistencia</th></tr></thead>
+                            <tbody id="tabla-asistencia"></tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>`;
+                document.body.appendChild(modalAsistencia);
+            }
+
+            function setRouteType(type) {
+                routeType = type;
+                const rutaSimple = document.getElementById('simple-route-tab');
+                const rutaMultiple = document.getElementById('multiple-route-tab');
+                if (type === 'simple') {
+                    rutaSimple.classList.add('active');
+                    rutaMultiple.classList.remove('active');
+                } else {
+                    rutaMultiple.classList.add('active');
+                    rutaSimple.classList.remove('active');
+                }
+                if (typeof clearSelectionMap === 'function') clearSelectionMap();
+            }
+
+            function setupEventListeners() {
+                // Filtro para el feed clásico
+                const classicFeedFilter = document.getElementById('classic-feed-filter-type');
+                if (classicFeedFilter) {
+                    classicFeedFilter.addEventListener('change', renderClassicFeed);
+                }
+                document.getElementById('view-toggle-btn').addEventListener('click', toggleView);
+                document.getElementById('publish-button').addEventListener('click', savePost);
+                document.getElementById('map-filter-type').addEventListener('change', (e) => renderMapMarkers(e.target.value));
+                document.querySelector('.create-post-widget-input').addEventListener('click', () => createPostModal.show());
+                
+                const floatingBtn = document.getElementById('floating-create-post-btn');
+                if (floatingBtn) {
+                    floatingBtn.addEventListener('click', () => createPostModal.show());
+                }
+                
+                const classicBtn = document.querySelector('.new-post-button');
+                if (classicBtn) {
+                    classicBtn.addEventListener('click', () => createPostModal.show());
+                }
+                
+                document.getElementById('menu-agenda').addEventListener('click', () => {
+                    renderAgenda();
+                    agendaModal.show();
+                });
+                document.getElementById('menu-inscripciones').addEventListener('click', () => {
+                    window.location.href = 'mis_inscripciones.html';
+                });
+                document.getElementById('menu-guardados').addEventListener('click', renderSavedEvents);
+
+                document.querySelectorAll('.left-sidebar-down li').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const filterType = item.dataset.filter || item.textContent.trim();
+                        const mappedFilter = {
+                            'Todos los tipos': 'all',
+                            'Deporte': 'Deporte',
+                            'Estudio': 'Estudio',
+                            'Social': 'Social',
+                            'Cultural': 'Cultural',
+                            'Otro': 'Otro'
+                        }[filterType] || 'all';
+
+                        document.getElementById('map-filter-type').value = mappedFilter;
+                        renderMapMarkers(mappedFilter);
+
+                        document.querySelectorAll('.left-sidebar-down li').forEach(li => li.style.backgroundColor = '');
+                        item.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                    });
+                });
+
+                const themeSelectorIcon = document.getElementById('theme-selector-icon');
+                const themeSelectorDropdown = document.getElementById('theme-selector-dropdown');
+
+                themeSelectorIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isShown = themeSelectorDropdown.classList.contains('show');
+                    closeAllDropdowns();
+                    if (!isShown) themeSelectorDropdown.classList.add('show');
+                });
+
+                document.querySelectorAll('.theme-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const themeName = item.dataset.theme;
+                        applyTheme(themeName);
+                        themeSelectorDropdown.classList.remove('show');
+                    });
+                });
+
+                const contactoIcon = document.getElementById('contacto-icon');
+                const contactoDropdown = document.getElementById('contacto-dropdown');
+
+                contactoIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isShown = contactoDropdown.classList.contains('show');
+                    closeAllDropdowns();
+                    if (!isShown) contactoDropdown.classList.add('show');
+                });
+
+
+
+
+                const mapStylesIcon = document.getElementById('map-styles-icon');
+                const mapStylesDropdown = document.getElementById('map-styles-dropdown');
+
+                mapStylesIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isShown = mapStylesDropdown.classList.contains('show');
+                    closeAllDropdowns();
+                    if (!isShown) mapStylesDropdown.classList.add('show');
+                });
+
+                document.querySelectorAll('.map-style-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const styleName = item.dataset.style;
+                        changeMapStyle(styleName);
+                        mapStylesDropdown.classList.remove('show');
+                    });
+                });
+
+                const dropdownIcons = {
+                    'requests-icon': 'requests-dropdown',
+                    'notifications-icon': 'notifications-dropdown',
+                    'profile-icon': 'profile-dropdown'
+                };
+                const closeAllDropdowns = () => {
+                    document.getElementById('theme-selector-dropdown').classList.remove('show');
+                    document.getElementById('map-styles-dropdown').classList.remove('show');
+                    document.getElementById('contacto-dropdown').classList.remove('show');
+                    Object.values(dropdownIcons).forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.classList.remove('show');
+                    });
+                };
+                Object.keys(dropdownIcons).forEach(iconId => {
+                    const icon = document.getElementById(iconId);
+                    const dropdown = document.getElementById(dropdownIcons[iconId]);
+                    if (icon && dropdown) {
+                        icon.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const isShown = dropdown.classList.contains('show');
+                            closeAllDropdowns();
+                            if (!isShown) dropdown.classList.add('show');
+                        });
+                    }
+                });
+                window.addEventListener('click', closeAllDropdowns);
+
+                document.getElementById('classic-feed-content').addEventListener('click', (e) => {
+                    const button = e.target.closest('button, .save-star-icon');
+                    if (!button) return;
+                    const postId = button.dataset.postId;
+                    if (!postId) return;
+                    if (button.classList.contains('btn-like')) toggleLike(postId);
+                    if (button.classList.contains('btn-delete'))
+                        if (confirm('¿Estás seguro de que quieres eliminar esta publicación?')) eliminarPost(postId);
+                    if (button.classList.contains('btn-comment')) {
+                        const commentInput = button.previousElementSibling;
+                        addComment(postId, commentInput.value);
+                        commentInput.value = '';
+                    }
+                    if (button.classList.contains('btn-inscribirse')) {
+                        handleSubscription(postId);
+                    }
+                    if (button.classList.contains('btn-ver-inscritos')) {
+                        const post = allPosts.find(p => p.id === postId);
+                        const lista = document.getElementById('lista-inscritos');
+                        lista.innerHTML = post.inscritos.length ? post.inscritos.map(u => `<li class='list-group-item'><strong>${u.userId}</strong> - ${u.nombre}</li>`).join('') : '<li class="list-group-item">No hay inscritos.</li>';
+                        new bootstrap.Modal(document.getElementById('modal-inscritos')).show();
+                    }
+                    if (button.classList.contains('btn-verificar-asistentes')) {
+                        const simulados = [
+                            { userId: 'USER001', nombre: 'Ana García', asistio: true },
+                            { userId: 'USER002', nombre: 'Luis Pérez', asistio: true },
+                            { userId: 'USER003', nombre: 'María López', asistio: false },
+                            { userId: 'USER004', nombre: 'Juan Rodríguez', asistio: true },
+                            { userId: 'USER005', nombre: 'Sofía Martínez', asistio: false },
+                            { userId: 'USER006', nombre: 'Carlos Díaz', asistio: true },
+                            { userId: 'USER007', nombre: 'Laura Sánchez', asistio: false },
+                            { userId: 'USER008', nombre: 'Pedro Gómez', asistio: true },
+                            { userId: 'USER009', nombre: 'Elena Fernández', asistio: false },
+                            { userId: 'USER010', nombre: 'Diego Ruiz', asistio: true }
+                        ];
+                        const tabla = document.getElementById('tabla-asistencia');
+                        tabla.innerHTML = simulados.map(u => `<tr><td>${u.userId}</td><td>${u.nombre}</td><td>${u.asistio ? 'Asistió ✅' : 'No asistió ❌'}</td></tr>`).join('');
+                        new bootstrap.Modal(document.getElementById('modal-asistencia')).show();
+                    }
+                    if (button.classList.contains('btn-terms')) {
+                        const post = allPosts.find(p => p.id === postId);
+                        if (post && post.terms) {
+                            let termsContent = post.terms.geoplanner || DEFAULT_GEOPLANNER_TERMS;
+                            
+                            if (post.terms.additional && post.terms.additional.trim()) {
+                                termsContent += '\n\n--- TÉRMINOS ADICIONALES DEL ORGANIZADOR ---\n\n' + post.terms.additional;
+                            }
+
+                            alert(termsContent);
+                        }
+                    }
+                    if (button.classList.contains('save-star-icon')) toggleSaveEvent(postId);
+                });
+
+                document.getElementById('agenda-modal').addEventListener('click', async (e) => {
+                    const button = e.target.closest('button');
+                    if (!button) return;
+                    const itemId = button.dataset.itemId;
+                    if (button.classList.contains('btn-delete-agenda')) {
+                        agendaItems = agendaItems.filter(i => i.id !== itemId);
+                        localStorage.setItem(STORAGE_KEY_AGENDA + USER_ID, JSON.stringify(agendaItems));
+                        renderAgenda();
+                    }
+                    if (button.classList.contains('btn-suggest')) {
+                        const item = agendaItems.find(i => i.id === itemId);
+                        if (!item) return;
+                        const prompt = `Para la actividad "${item.title}" programada para el ${item.date}, genera una lista de 5 a 7 pasos o tareas clave para su organización. Responde solo con los pasos, separados por comas.`;
+                        const result = await callGeminiAPI(prompt, button);
+                        if (result) {
+                            const stepsHtml = result.split(',').map(step => `<li class="list-group-item list-group-item-light py-1">${step.trim()}</li>`).join('');
+                            document.getElementById(`steps-${itemId}`).innerHTML = `<ul class="list-group mt-2">${stepsHtml}</ul>`;
+                        }
+                    }
+                });
+                document.getElementById('agenda-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const newItem = {
+                        id: 'agenda_' + Date.now(),
+                        title: document.getElementById('agenda-title').value,
+                        desc: document.getElementById('agenda-desc').value,
+                        date: document.getElementById('agenda-date').value,
+                    };
+                    agendaItems.unshift(newItem);
+                    localStorage.setItem(STORAGE_KEY_AGENDA + USER_ID, JSON.stringify(agendaItems));
+                    renderAgenda();
+                    e.target.reset();
+                });
+
+                const mapSelectModalEl = document.getElementById('map-select-modal');
+                let selectLocationBtn = document.getElementById('publicacion-location-btn');
+                if (selectLocationBtn) {
+                    selectLocationBtn.removeAttribute('data-bs-toggle');
+                    selectLocationBtn.removeAttribute('data-bs-target');
+                    selectLocationBtn.addEventListener('click', function (e) {
+                        let publicarActivo= document.getElementById('publicacion-location-btn');
+                        e.preventDefault();
+                        const modalInstance = bootstrap.Modal.getOrCreateInstance(mapSelectModalEl);
+                        modalInstance.show();
+                    });
+                }
+
+                let agendaLocationBtn = document.getElementById('agenda-location-btn');
+                if (agendaLocationBtn) {
+                    agendaLocationBtn.removeAttribute('data-bs-toggle');
+                    agendaLocationBtn.removeAttribute('data-bs-target');
+                    agendaLocationBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        let publicarAgenda = document.getElementById('agenda-location-btn');
+                        // Oculta el modal de la agenda antes de mostrar el de ubicación
+                        const agendaModalEl = document.getElementById('agenda-modal');
+                        if (agendaModalEl) {
+                            bootstrap.Modal.getOrCreateInstance(agendaModalEl).hide();
+                        }
+                        setTimeout(() => {
+                            const modalInstance = bootstrap.Modal.getOrCreateInstance(mapSelectModalEl);
+                            modalInstance.show();
+                        }, 300); // Espera a que se oculte el modal anterior
+                    });
+                }
+
+
+                mapSelectModalEl.addEventListener('shown.bs.modal', function () {
+                    if (!selectionMap) {
+                        selectionMap = L.map('modal-map-container').setView([10.654, -71.612], 13);
+                        const style = mapStyles[currentMapStyle];
+                        L.tileLayer(style.url, {
+                            attribution: style.attribution
+                        }).addTo(selectionMap);
+                        selectionMap.on('click', (e) => {
+                            if (routeType === 'simple' && selectedMarkers.length > 0) clearSelectionMap();
+                            const newMarker = L.marker(e.latlng).addTo(selectionMap);
+                            selectedMarkers.push(newMarker);
+                            if (selectionRoutingControl) {
+                                selectionMap.removeControl(selectionRoutingControl);
+                                selectionRoutingControl = null;
+                            }
+                            if (routeType === 'multiple' && selectedMarkers.length > 1) {
+                                if (selectionPolyline) {
+                                    selectionMap.removeLayer(selectionPolyline);
+                                    selectionPolyline = null;
+                                }
+                                const waypoints = selectedMarkers.map(m => m.getLatLng());
+                                selectionRoutingControl = L.Routing.control({
+                                    waypoints: waypoints,
+                                    createMarker: function() { return null; },
+                                    routeWhileDragging: false,
+                                    show: false,
+                                    addWaypoints: false,
+                                    lineOptions: {
+                                        styles: [{color: '#007BFF', opacity: 0.8, weight: 5}]
+                                    }
+                                }).addTo(selectionMap);
+                            } else if (routeType === 'multiple' && selectedMarkers.length === 1) {
+                                if (selectionRoutingControl) {
+                                    selectionMap.removeControl(selectionRoutingControl);
+                                    selectionRoutingControl = null;
+                                }
+                            }
+                        });
+                    }
+                    setTimeout(() => selectionMap.invalidateSize(), 10);
+                });
+                mapSelectModalEl.addEventListener('hidden.bs.modal', function () {
+                    const createPostModalEl = document.getElementById('create-post-modal');
+                    if (createPostModalEl) {
+                        createPostModalEl.classList.remove('modal-blur');
+                    }
+                });
+                const clearSelectionMap = () => {
+                    selectedMarkers.forEach(m => selectionMap.removeLayer(m));
+                    selectedMarkers = [];
+                    if (selectionPolyline) {
+                        selectionMap.removeLayer(selectionPolyline);
+                        selectionPolyline = null;
+                    }
+                    if (selectionRoutingControl) {
+                        selectionMap.removeControl(selectionRoutingControl);
+                        selectionRoutingControl = null;
+                    }
+                };
+                document.getElementById('clear-map-button').addEventListener('click', () => {
+                    clearSelectionMap();
+                    borrarRuta();
+                });
+                document.getElementById('simple-route-tab').addEventListener('click', () => setRouteType('simple'));
+                document.getElementById('multiple-route-tab').addEventListener('click', () => setRouteType('multiple'));
+                document.getElementById('accept-location-button').addEventListener('click', () => {
+                    if (selectedMarkers.length > 0) {
+                        const latlngs = selectedMarkers.map(m => m.getLatLng());
+                        document.getElementById('location-display').textContent = routeType === 'simple' ? `Ubicación: [${latlngs[0].lat.toFixed(4)}, ${latlngs[0].lng.toFixed(4)}]` : `Ruta Múltiple (${selectedMarkers.length} puntos)`;
+                        document.getElementById('agenda-location-display').textContent = document.getElementById('location-display').textContent;
+                        document.activeElement.blur();
+                        bootstrap.Modal.getInstance(mapSelectModalEl).hide();
+                        if(publicarAgenda === document.getElementById('agenda-location-btn')){
+                            const agendaLocation = document.getElementById('agenda-modal');
+                            agendaLocation.classList.remove('modal-blur');
+                            bootstrap.Modal.getOrCreateInstance(agendaLocation).show();
+                            publicarAgenda = '';
+                        } else if (publicarActivo === document.getElementById('publicacion-location-btn')) {
+                            const createPostModalEl = document.getElementById('create-post-modal');
+                            createPostModalEl.classList.remove('modal-blur');
+                            bootstrap.Modal.getOrCreateInstance(createPostModalEl).show();
+                            publicarActivo = '';
+                        }
+                    } else {
+                        alert("Por favor, selecciona al menos un punto.");
+                    }
+                });
+
+                // Inicializar términos y condiciones
+                initTermsAndConditions();
+            }
+
+            async function callGeminiAPI(prompt, button) {
+                const originalText = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+                try {
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    const payload = {
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }]
+                    };
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`Error de red: ${response.statusText}`);
+                    const result = await response.json();
+                    if (result.candidates && result.candidates[0].content.parts[0].text) {
+                        return result.candidates[0].content.parts[0].text;
+                    } else {
+                        throw new Error("Respuesta no válida de la API.");
+                    }
+                } catch (error) {
+                    console.error("Error con API de Gemini:", error);
+                    alert("Hubo un error al contactar a la IA.");
+                    return null;
+                } finally {
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                }
+            }
+
+            // --- BUSCADOR DE DIRECCIONES ---
+            let searchMarker = null;
+
+            const addressInput = document.getElementById('address-search-input');
+            const addressBtn = document.getElementById('address-search-btn');
+            const suggestionsBox = document.getElementById('address-suggestions');
+
+            addressInput.addEventListener('input', async function () {
+                const query = this.value.trim();
+                if (query.length < 3) {
+                    suggestionsBox.innerHTML = '';
+                    suggestionsBox.style.display = 'none';
+                    return;
+                }
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5&countrycodes=ve`;
+                try {
+                    const res = await fetch(url, { headers: { 'Accept-Language': 'es' } });
+                    const results = await res.json();
+                    if (results.length === 0) {
+                        suggestionsBox.innerHTML = '<div class="list-group-item">No se encontraron resultados.</div>';
+                        suggestionsBox.style.display = 'block';
+                        return;
+                    }
+                    suggestionsBox.innerHTML = results.map(r =>
+                        `<button type="button" class="list-group-item list-group-item-action" data-lat="${r.lat}" data-lon="${r.lon}">${r.display_name}</button>`
+                    ).join('');
+                    suggestionsBox.style.display = 'block';
+                } catch (err) {
+                    suggestionsBox.innerHTML = '<div class="list-group-item">Error de conexión.</div>';
+                    suggestionsBox.style.display = 'block';
+                }
+            });
+
+            suggestionsBox.addEventListener('click', function (e) {
+                const btn = e.target.closest('button[data-lat][data-lon]');
+                if (!btn) return;
+                const lat = parseFloat(btn.dataset.lat);
+                const lon = parseFloat(btn.dataset.lon);
+                centerMapOnAddress(lat, lon, btn.textContent);
+                suggestionsBox.innerHTML = '';
+                suggestionsBox.style.display = 'none';
+                addressInput.value = btn.textContent;
+            });
+
+            addressBtn.addEventListener('click', async function () {
+                const query = addressInput.value.trim();
+                if (!query) return;
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=1&countrycodes=ve`;
+                try {
+                    const res = await fetch(url, { headers: { 'Accept-Language': 'es' } });
+                    const results = await res.json();
+                    if (results.length > 0) {
+                        const lat = parseFloat(results[0].lat);
+                        const lon = parseFloat(results[0].lon);
+                        centerMapOnAddress(lat, lon, results[0].display_name);
+                    } else {
+                        alert('No se encontró la dirección.');
+                    }
+                } catch (err) {
+                    alert('Error de conexión.');
+                }
+                suggestionsBox.innerHTML = '';
+                suggestionsBox.style.display = 'none';
+            });
+
+            function centerMapOnAddress(lat, lon, label) {
+                if (!mainMap) return;
+                mainMap.setView([lat, lon], 16, { animate: true });
+                if (searchMarker) mainMap.removeLayer(searchMarker);
+                searchMarker = L.marker([lat, lon], {
+                    icon: L.divIcon({
+                        html: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#007bff" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
+                        className: 'search-marker',
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 32],
+                        popupAnchor: [0, -36]
+                    })
+                }).addTo(mainMap).bindPopup(`<b>${label}</b>`).openPopup();
+            }
+
+            document.addEventListener('click', function (e) {
+                if (!addressInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                    suggestionsBox.innerHTML = '';
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+
+            // --- BUSCADOR DE DIRECCIONES EN EL MODAL DE UBICACIÓN ---
+            let modalSearchMarker = null;
+
+            const modalAddressInput = document.getElementById('modal-address-search-input');
+            const modalAddressBtn = document.getElementById('modal-address-search-btn');
+            const modalSuggestionsBox = document.getElementById('modal-address-suggestions');
+
+            modalAddressInput.addEventListener('input', async function () {
+                const query = this.value.trim();
+                if (query.length < 3) {
+                    modalSuggestionsBox.innerHTML = '';
+                    modalSuggestionsBox.style.display = 'none';
+                    return;
+                }
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5&countrycodes=ve`;
+                try {
+                    const res = await fetch(url, { headers: { 'Accept-Language': 'es' } });
+                    const results = await res.json();
+                    if (results.length === 0) {
+                        modalSuggestionsBox.innerHTML = '<div class="list-group-item">No se encontraron resultados.</div>';
+                        modalSuggestionsBox.style.display = 'block';
+                        return;
+                    }
+                    modalSuggestionsBox.innerHTML = results.map(r =>
+                        `<button type="button" class="list-group-item list-group-item-action" data-lat="${r.lat}" data-lon="${r.lon}">${r.display_name}</button>`
+                    ).join('');
+                    modalSuggestionsBox.style.display = 'block';
+                } catch (err) {
+                    modalSuggestionsBox.innerHTML = '<div class="list-group-item">Error de conexión.</div>';
+                    modalSuggestionsBox.style.display = 'block';
+                }
+            });
+
+            modalSuggestionsBox.addEventListener('click', function (e) {
+                const btn = e.target.closest('button[data-lat][data-lon]');
+                if (!btn) return;
+                const lat = parseFloat(btn.dataset.lat);
+                const lon = parseFloat(btn.dataset.lon);
+                centerModalMapOnAddress(lat, lon, btn.textContent);
+                modalSuggestionsBox.innerHTML = '';
+                modalSuggestionsBox.style.display = 'none';
+                modalAddressInput.value = btn.textContent;
+            });
+
+            modalAddressBtn.addEventListener('click', async function () {
+                const query = modalAddressInput.value.trim();
+                if (!query) return;
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=1&countrycodes=ve`;
+                try {
+                    const res = await fetch(url, { headers: { 'Accept-Language': 'es' } });
+                    const results = await res.json();
+                    if (results.length > 0) {
+                        const lat = parseFloat(results[0].lat);
+                        const lon = parseFloat(results[0].lon);
+                        centerModalMapOnAddress(lat, lon, results[0].display_name);
+                    } else {
+                        alert('No se encontró la dirección.');
+                    }
+                } catch (err) {
+                    alert('Error de conexión.');
+                }
+                modalSuggestionsBox.innerHTML = '';
+                modalSuggestionsBox.style.display = 'none';
+            });
+
+            function centerModalMapOnAddress(lat, lon, label) {
+                if (!selectionMap) return;
+                selectionMap.setView([lat, lon], 16, { animate: true });
+                if (modalSearchMarker) selectionMap.removeLayer(modalSearchMarker);
+                if (routeType === 'simple' && selectedMarkers.length > 0) {
+                    selectedMarkers.forEach(m => selectionMap.removeLayer(m));
+                    selectedMarkers = [];
+                }
+                modalSearchMarker = L.marker([lat, lon], {
+                    icon: L.divIcon({
+                        html: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#007bff" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
+                        className: 'search-marker',
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 32],
+                        popupAnchor: [0, -36]
+                    })
+                }).addTo(selectionMap).bindPopup(`<b>${label}</b>`).openPopup();
+
+                if (routeType === 'simple') {
+                    selectedMarkers.push(modalSearchMarker);
+                }
+            }
+
+            document.addEventListener('click', function (e) {
+                if (!modalAddressInput.contains(e.target) && !modalSuggestionsBox.contains(e.target)) {
+                    modalSuggestionsBox.innerHTML = '';
+                    modalSuggestionsBox.style.display = 'none';
+                }
+            });
+
+            // --- INITIALIZATION ---
+            function initialize() {
+                initData();
+                initMainMap();
+                renderMapMarkers();
+                setupEventListeners();
+                renderClassicFeed();
+            }
+
+            initialize();
         });
-    });
-  </script>
+    </script>
 </body>
+
 </html>

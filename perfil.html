@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoPlanner - Mi Perfil</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="css/perfil.css" />
+  <link rel="icon" href="img/LogoMini.png" type="image/x-icon">
+</head>
+<body>
+
+  <header>
+    <div class="d-flex align-items-center gap-2">
+      <a href="dashboard.html" class="d-flex align-items-center gap-2 text-white text-decoration-none">
+        <img src="img/LogoMini.png" alt="Logo" style="width: 36px;" />
+        <strong class="fs-5">GeoPlanner</strong>
+      </a>
+    </div>
+    <div class="search-bar">
+      <input type="text" placeholder="Buscar personas o grupos..." />
+    </div>
+    <div class="icon-bar">
+      <span class="icon-button" title="Solicitudes de amistad">🤝</span>
+      <span class="icon-button" title="Notificaciones">🔔</span>
+      <span class="icon-button" id="profile-icon" title="Perfil">👤</span>
+      <div class="dropdown-content" id="profile-dropdown">
+        <a href="perfil.html" class="dropdown-item-custom">
+             <img class="foto-usuario" src="img/placeholder.png" alt="profile">
+
+            <div>
+              <span class="nombre-usuario">Usuario</span>
+              <br />
+              <small>Ver tu perfil</small>
+            </div>
+          </a>
+          <hr class="my-2" />
+          <a href="#" class="dropdown-item-custom"
+            ><span>⚙️</span>
+            <div><strong>Configuración</strong></div></a
+          >
+          <a href="index.html" class="dropdown-item-custom" id="logout-button"
+            ><span>➡️</span>
+            <div><strong>Cerrar sesión</strong></div></a
+          >
+        </div>
+      </div>
+    </header>
+
+    <div class="container-xl">
+      <div class="profile-header">
+        <img
+          src="img/placeholder.png"
+          alt="Foto de Perfil"
+          class="profile-picture foto-usuario"
+        />
+        <h1 class="profile-name nombre-usuario">Cargando...</h1>
+        <p class="profile-username">@<span id="username-display"></span></p>
+        <p class="profile-bio" id="bio-display">Cargando biografía...</p>
+        <div class="profile-stats">
+          <div class="text-center">
+            <strong id="post-count">0</strong>
+            <span>Publicaciones</span>
+          </div>
+          <div class="text-center">
+            <strong id="friend-count">12</strong>
+            <span>Amigos</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-container row">
+        <aside class="profile-sidebar col-lg-4 d-none d-lg-block">
+          <h6 class="fw-bold mb-3">Amigos</h6>
+          <div class="d-flex flex-column gap-3">
+            <div class="d-flex align-items-center gap-2">
+              <img
+                src="img/placeholder.png"
+                alt="amigo"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  object-fit: cover;
+                  border-radius: 50%;
+                "
+              />
+              <div>
+                <a href="#" class="text-decoration-none fw-bold"
+                  >Ana Rodriguez</a
+                >
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <img
+                src="img/placeholder.png"
+                alt="amigo"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  object-fit: cover;
+                  border-radius: 50%;
+                "
+              />
+              <div>
+                <a href="#" class="text-decoration-none fw-bold">Luis Perez</a>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <img
+                src="img/placeholder.png"
+                alt="amigo"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  object-fit: cover;
+                  border-radius: 50%;
+                "
+              />
+              <div>
+                <a href="#" class="text-decoration-none fw-bold"
+                  >Carlos Martinez</a
+                >
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <div class="col-lg-8 col-md-12">
+          <div class="new-post">
+            <h6><strong>Crear nueva publicación</strong></h6>
+            <textarea
+              id="post-text"
+              class="form-control mb-2"
+              rows="2"
+              placeholder="¿Qué estás organizando?..."
+            ></textarea>
+            <input
+              type="file"
+              id="file-media"
+              class="form-control mb-2"
+              accept="image/*,video/*"
+            />
+            <button
+              class="btn btn-outline-primary w-100 mb-2"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#map-modal"
+            >
+              📍 Seleccionar Ubicación (Obligatorio)
+            </button>
+            <div id="location-display" class="mb-2">
+              No se ha seleccionado ninguna ubicación.
+            </div>
+            <div id="post-map-preview-container"></div>
+            <select class="form-select mb-2" id="privacidad">
+              <option value="publica">Pública</option>
+              <option value="amigos">Solo amigos</option>
+              <option value="privada">Privada con invitación</option>
+            </select>
+            <button id="publish-button" class="btn btn-primary w-100" disabled>
+              Publicar
+            </button>
+          </div>
+
+          <main class="feed"></main>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="map-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Define la ubicación de tu evento</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <ul class="nav nav-tabs" role="tablist">
+              <li class="nav-item">
+                <button
+                  class="nav-link active"
+                  id="simple-route-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#map-panel"
+                >
+                  📍 Ruta Simple
+                </button>
+              </li>
+              <li class="nav-item">
+                <button
+                  class="nav-link"
+                  id="multiple-route-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#map-panel"
+                >
+                  ➯ Ruta Múltiple
+                </button>
+              </li>
+            </ul>
+            <p class="form-text mt-2">
+              <strong>Ruta Simple:</strong> Un único marcador.<br /><strong
+                >Ruta Múltiple:</strong
+              >
+              Traza una ruta con varios puntos.
+            </p>
+            <div id="modal-map-container" style="height: 400px"></div>
+            <div id="ruta-inputs" class="mt-3"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-warning" id="clear-map-button">
+              Limpiar Mapa
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="accept-location-button"
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer-bar">
+        <div class="container-fluid d-flex flex-wrap justify-content-between align-items-center px-4 py-3">
+            <span class="footer-text">© 2025 GeoPlanner. Todos los derechos reservados — Creado por The GeoPlanner Group.</span>
+            <div class="footer-links d-flex flex-wrap gap-3">
+                <a href="terminos.html" class="footer-link" target="_blank">Términos</a>
+                <a href="privacidad.html" class="footer-link" target="_blank">Privacidad</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+      // --- COMIENZO DEL SCRIPT ---
+      document.addEventListener("DOMContentLoaded", function () {
+        // --- VARIABLES Y CONSTANTES ESENCIALES ---
+        const STORAGE_KEY = "geoplanner_posts";
+        let currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+        // Si no hay sesión, buscamos en los usuarios registrados (simulación para desarrollo)
+        if (!currentUser) {
+          const users =
+            JSON.parse(localStorage.getItem("geoPlannerUsers")) || [];
+          currentUser = users.find((u) => u.nombreUsuario === "juan_sarcos"); // Simulación para 'juan_sarcos'
+        }
+        const USER_ID = currentUser ? currentUser.nombreUsuario : "juan_sarcos";
+
+        // --- LÓGICA DE DROPDOWNS DEL HEADER --- (Idéntica a dashboard.html)
+        const dropdownIcons = { "profile-icon": "profile-dropdown" };
+        const closeAllDropdowns = () => {
+          Object.values(dropdownIcons).forEach((id) =>
+            document.getElementById(id)?.classList.remove("show")
+          );
+        };
+        Object.keys(dropdownIcons).forEach((iconId) => {
+          const icon = document.getElementById(iconId);
+          const dropdown = document.getElementById(dropdownIcons[iconId]);
+          if (icon && dropdown) {
+            icon.addEventListener("click", (e) => {
+              e.stopPropagation();
+              const isShown = dropdown.classList.contains("show");
+              closeAllDropdowns();
+              if (!isShown) dropdown.classList.add("show");
+            });
+          }
+        });
+        window.addEventListener("click", () => closeAllDropdowns());
+
+        // --- LÓGICA DEL MAPA PARA CREAR PUBLICACIÓN --- (Idéntica a dashboard.html)
+        const mapModalEl = document.getElementById("map-modal");
+        const acceptLocationButton = document.getElementById(
+          "accept-location-button"
+        );
+        const clearMapButton = document.getElementById("clear-map-button");
+        const publishButton = document.getElementById("publish-button");
+        const locationDisplay = document.getElementById("location-display");
+        const postMapPreviewContainer = document.getElementById(
+          "post-map-preview-container"
+        );
+
+        let modalMap, postPreviewMap;
+        let routeType = "simple";
+        let markers = [];
+        let polyline = null;
+        const geoPlannerIcon = L.icon({
+          iconUrl: "img/LogoMini.png",
+          iconSize: [40, 40],
+          iconAnchor: [20, 40],
+        });
+
+        mapModalEl.addEventListener("shown.bs.modal", function () {
+          if (!modalMap) {
+            modalMap = L.map("modal-map-container").setView(
+              [10.654, -71.612],
+              13
+            );
+            L.tileLayer(
+              "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            ).addTo(modalMap);
+            modalMap.on("click", onMapClick);
+          }
+          setTimeout(() => modalMap.invalidateSize(), 10);
+        });
+
+        document
+          .getElementById("simple-route-tab")
+          .addEventListener("click", () => {
+            routeType = "simple";
+            clearMap();
+          });
+        document
+          .getElementById("multiple-route-tab")
+          .addEventListener("click", () => {
+            routeType = "multiple";
+            clearMap();
+          });
+
+        const onMapClick = (e) => {
+          if (routeType === "simple" && markers.length > 0) clearMap();
+          const newMarker = L.marker(e.latlng, { icon: geoPlannerIcon }).addTo(
+            modalMap
+          );
+          markers.push(newMarker);
+          if (routeType === "multiple") {
+            if (markers.length > 1) {
+              if (polyline) modalMap.removeLayer(polyline);
+              polyline = L.polyline(
+                markers.map((m) => m.getLatLng()),
+                { color: "#007BFF" }
+              ).addTo(modalMap);
+            }
+          }
+        };
+
+        const clearMap = () => {
+          markers.forEach((m) => modalMap.removeLayer(m));
+          markers = [];
+          if (polyline) {
+            modalMap.removeLayer(polyline);
+            polyline = null;
+          }
+        };
+        clearMapButton.addEventListener("click", clearMap);
+
+        acceptLocationButton.addEventListener("click", function () {
+          if (markers.length === 0) {
+            alert("Por favor, selecciona al menos un punto.");
+            return;
+          }
+          const latlngs = markers.map((m) => m.getLatLng());
+          locationDisplay.textContent =
+            routeType === "simple"
+              ? `Ubicación: [${latlngs[0].lat.toFixed(
+                  4
+                )}, ${latlngs[0].lng.toFixed(4)}]`
+              : `Ruta Múltiple (${markers.length} puntos)`;
+          publishButton.disabled = false;
+          bootstrap.Modal.getInstance(mapModalEl).hide();
+        });
+
+        // --- CARGA Y RENDERIZADO DE POSTS --- (Modificado para perfil)
+        function loadPosts() {
+          const allPosts = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+          const userPosts = allPosts.filter((post) => post.autor === USER_ID); // <-- !! LA MODIFICACIÓN CLAVE
+          const feed = document.querySelector(".feed");
+
+          feed.innerHTML = "";
+          userPosts.sort(
+            (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+          );
+          userPosts.forEach((post) => feed.appendChild(renderPost(post)));
+
+          // Actualizar contador de publicaciones
+          document.getElementById("post-count").textContent = userPosts.length;
+        }
+
+        function renderPost(post) {
+          const container = document.createElement("div");
+          container.classList.add("post");
+          const privacyBadge =
+            {
+              publica: "🔓 Pública",
+              amigos: "👥 Amigos",
+              privada: "🔒 Privada",
+            }[post.privacidad] || "🔓 Pública";
+
+          container.innerHTML = `
+            <h6>
+                <strong>${
+                  post.autor
+                }</strong> <span class="badge bg-secondary">${privacyBadge}</span>
+            </h6>
+            <p>${post.texto}</p>
+            ${
+              post.mediaURL
+                ? `<img src="${post.mediaURL}" alt="Media" class="img-fluid rounded mb-2">`
+                : ""
+            }
+            <div class="map-container mb-2" id="map-${post.id}"></div>
+            <div class="d-flex gap-2 mt-2">
+                <button class="btn btn-sm btn-outline-danger" id="btn-like-${
+                  post.id
+                }">
+                    ${
+                      post.likers.includes(USER_ID)
+                        ? "💔 Quitar Like"
+                        : "❤️ Like"
+                    } (<span id="likes-${post.id}">${post.likes}</span>)
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" id="btn-comment-toggle-${
+                  post.id
+                }">💬 Comentarios (${post.comentarios.length})</button>
+            </div>
+            <div class="comentarios mt-2 collapse" id="comentarios-${
+              post.id
+            }"></div>`;
+
+          // Renderizar mapa de la publicación (idéntico a dashboard)
+          setTimeout(() => {
+            const map = L.map(container.querySelector(`#map-${post.id}`), {
+              zoomControl: false,
+              scrollWheelZoom: false,
+              dragging: true,
+            });
+            L.tileLayer(
+              "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            ).addTo(map);
+            const postMarkers = [];
+            const latlngs = post.rutas.map((r) =>
+              r.coords.split(",").map(Number)
+            );
+            latlngs.forEach((latlng) => {
+              postMarkers.push(
+                L.marker(latlng, {
+                  icon: L.icon({
+                    iconUrl: "img/LogoMini.png",
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 32],
+                  }),
+                }).addTo(map)
+              );
+            });
+            if (latlngs.length > 1) {
+              const polyline = L.polyline(latlngs, { color: "#007BFF" }).addTo(
+                map
+              );
+              map.fitBounds(polyline.getBounds(), { padding: [30, 30] });
+            } else if (postMarkers.length > 0) {
+              map.setView(postMarkers[0].getLatLng(), 15);
+            }
+            map.invalidateSize();
+          }, 0);
+
+          // Lógica de botones y comentarios... (idéntica a dashboard)
+          container
+            .querySelector(`#btn-like-${post.id}`)
+            .addEventListener("click", () => toggleLike(post.id));
+          container
+            .querySelector(`#btn-comment-toggle-${post.id}`)
+            .addEventListener(
+              "click",
+              () =>
+                new bootstrap.Collapse(
+                  container.querySelector(`#comentarios-${post.id}`),
+                  { toggle: true }
+                )
+            );
+
+          return container;
+        }
+
+        // --- LÓGICA DE INTERACCIÓN (Likes, Comentarios, Guardar) --- (Idéntica a dashboard.html)
+        function toggleLike(postId) {
+          /* ...código de dashboard.html... */
+        }
+        function addComment(postId, text) {
+          /* ...código de dashboard.html... */
+        }
+
+        function guardarPublicacion() {
+          const texto = document.getElementById("post-text").value.trim();
+          const privacidad = document.getElementById("privacidad").value;
+          const archivo = document.getElementById("file-media").files[0];
+          if (markers.length === 0 || !texto) {
+            alert("El texto y la ubicación son obligatorios.");
+            return;
+          }
+
+          const newPost = {
+            id: "post_" + Date.now(),
+            autor: USER_ID,
+            username: USER_ID,
+            texto,
+            privacidad,
+            mediaURL: "",
+            rutas: markers.map((m) => ({
+              coords: `${m.getLatLng().lat},${m.getLatLng().lng}`,
+              label: "",
+            })),
+            timestamp: new Date().toISOString(),
+            likes: 0,
+            likers: [],
+            comentarios: [],
+          };
+
+          if (archivo) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              newPost.mediaURL = e.target.result;
+              guardarYActualizarFeed(newPost);
+            };
+            reader.readAsDataURL(archivo);
+          } else {
+            guardarYActualizarFeed(newPost);
+          }
+        }
+
+        function guardarYActualizarFeed(post) {
+          let posts = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+          posts.push(post);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+
+          document.getElementById("post-text").value = "";
+          document.getElementById("file-media").value = "";
+          document.getElementById("location-display").textContent =
+            "Ninguna ubicación seleccionada";
+          publishButton.disabled = true;
+
+          clearMap();
+          loadPosts();
+        }
+
+        // 1. Objeto con la definición de todos los temas
+        const temas = {
+          default: {
+            headerBG: "linear-gradient(145deg, #007BFF, #003366)",
+            headerText: "white",
+            bodyBG: "#f0f2f5",
+            cardBG: "#ffffff",
+            cardText: "#333",
+            btnPrimaryBG: "#00bfff",
+          },
+          noche: {
+            headerBG: "linear-gradient(145deg, #141E30, #243B55)",
+            headerText: "white",
+            bodyBG: "#0f172a",
+            cardBG: "#1e293b",
+            cardText: "#e2e8f0",
+            btnPrimaryBG: "#38bdf8",
+          },
+          aurora: {
+            headerBG: "linear-gradient(145deg, #F8CDDA, #1D2B64)",
+            headerText: "#FFFFFF",
+            bodyBG: "#fdeff2",
+            cardBG: "#ffffff",
+            cardText: "#1D2B64",
+            btnPrimaryBG: "#1D2B64",
+          },
+          // ... y todos los demás temas que definiste
+        };
+
+        // 2. Función para aplicar el tema
+        function applyTheme(themeName) {
+          const root = document.documentElement;
+          const theme = temas[themeName] || temas.default; // Usar 'default' si el tema no se encuentra
+
+          // Aplicar todas las propiedades del tema a las variables CSS
+          root.style.setProperty("--header-bg", theme.headerBG);
+          root.style.setProperty("--header-text-color", theme.headerText);
+          root.style.setProperty("--body-bg", theme.bodyBG);
+          root.style.setProperty("--card-bg", theme.cardBG);
+          root.style.setProperty("--card-text-color", theme.cardText);
+          root.style.setProperty("--btn-primary-bg", theme.btnPrimaryBG);
+          root.style.setProperty("--btn-primary-text", theme.headerText);
+          // ... (puedes añadir aquí las demás variables como --sidebar-bg, etc.)
+        }
+
+        // 3. Función para cargar los datos del usuario y aplicar el tema
+        function loadUserData() {
+          const nombre = localStorage.getItem("geoPlannerNombre") || "Usuario";
+          const apellido = localStorage.getItem("geoPlannerApellido") || "";
+          const foto = localStorage.getItem("geoPlannerFotoPerfil");
+          const tema = localStorage.getItem("geoPlannerTema") || "default";
+
+          // Cambiar nombre en header/perfil
+          document.querySelectorAll(".nombre-usuario").forEach((el) => {
+            el.textContent = `${nombre} ${apellido}`;
+          });
+
+          // Cambiar foto de perfil
+          if (foto) {
+            document.querySelectorAll(".foto-usuario").forEach((el) => {
+              el.src = foto;
+            });
+          }
+
+          // Aplicar el tema guardado
+          applyTheme(tema);
+        }
+
+        // --- INICIALIZACIÓN ---
+        // Llama a la función principal que carga datos y tema
+        loadUserData();
+        // Llama a las otras funciones de tu página
+        // loadPosts();
+      });
+    </script>
+  </body>
+</html>

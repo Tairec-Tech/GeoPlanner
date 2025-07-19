@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preguntas Frecuentes - GeoPlanner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/faq.css">
+</head>
+<body>
+    <header class="d-flex justify-content-between align-items-center">
+        <a class="d-flex align-items-center gap-2 text-white text-decoration-none">
+            <img src="img/LogoMini.png" alt="Logo" style="width: 36px;">
+            <strong class="fs-5">GeoPlanner</strong>
+        </a>
+    </header>
+
+    <div class="content-container">
+        <div class="text-center mb-4">
+            <h1 class="display-4 mb-3">Preguntas Frecuentes</h1>
+            <p class="lead">Encuentra respuestas rápidas a las dudas más comunes sobre GeoPlanner</p>
+        </div>
+
+        <div class="search-box">
+            <h5 class="mb-3">🔍 Busca tu pregunta</h5>
+            <input type="text" class="search-input" id="searchInput" placeholder="Escribe tu pregunta aquí...">
+        </div>
+
+        <div class="category-tabs" id="categoryTabs">
+            <button class="category-tab active" data-category="all">📋 Todas</button>
+            <button class="category-tab" data-category="account">👤 Cuenta</button>
+            <button class="category-tab" data-category="events">📅 Eventos</button>
+            <button class="category-tab" data-category="safety">🛡️ Seguridad</button>
+            <button class="category-tab" data-category="technical">⚙️ Técnico</button>
+            <button class="category-tab" data-category="privacy">🔒 Privacidad</button>
+        </div>
+
+        <div id="faqContainer">
+            <!-- Preguntas sobre Cuenta -->
+            <div class="faq-item" data-category="account">
+                <div class="faq-question">
+                    <span class="faq-icon">👤</span>
+                    <span>¿Cómo creo una cuenta en GeoPlanner?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Crear una cuenta es muy sencillo:</p>
+                    <ol>
+                        <li>Haz clic en "Registrarse" en la página principal</li>
+                        <li>Completa tus datos personales (nombre, apellido, fecha de nacimiento)</li>
+                        <li>Elige tu nombre de usuario y contraseña</li>
+                        <li>Personaliza tu perfil con foto y ubicación</li>
+                        <li>¡Listo! Ya puedes empezar a usar GeoPlanner</li>
+                    </ol>
+                    <div class="highlight-tip">
+                        <strong>💡 Consejo:</strong> Usa una foto de perfil real para generar más confianza con otros usuarios.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="account">
+                <div class="faq-question">
+                    <span class="faq-icon">🔑</span>
+                    <span>¿Qué hago si olvido mi contraseña?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Si olvidaste tu contraseña:</p>
+                    <ol>
+                        <li>Ve a la página de inicio de sesión</li>
+                        <li>Haz clic en "¿Olvidó su contraseña?"</li>
+                        <li>Ingresa tu email o nombre de usuario</li>
+                        <li>Revisa tu correo electrónico</li>
+                        <li>Sigue las instrucciones para crear una nueva contraseña</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="account">
+                <div class="faq-question">
+                    <span class="faq-icon">✏️</span>
+                    <span>¿Puedo cambiar mi nombre de usuario después de registrarme?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Actualmente, el nombre de usuario no se puede cambiar una vez creada la cuenta. Esto es para mantener la consistencia y evitar confusiones entre los usuarios.</p>
+                    <div class="warning-tip">
+                        <strong>⚠️ Importante:</strong> Elige cuidadosamente tu nombre de usuario durante el registro.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preguntas sobre Eventos -->
+            <div class="faq-item" data-category="events">
+                <div class="faq-question">
+                    <span class="faq-icon">📅</span>
+                    <span>¿Cómo creo un evento en GeoPlanner?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Para crear un evento:</p>
+                    <ol>
+                        <li>Haz clic en el botón "+" o "Crear Publicación"</li>
+                        <li>Escribe la descripción de tu evento</li>
+                        <li>Selecciona el tipo de evento (Social, Deporte, Estudio, etc.)</li>
+                        <li>Elige la fecha y hora</li>
+                        <li>Selecciona la ubicación en el mapa</li>
+                        <li>Configura la privacidad (público, amigos, privado)</li>
+                        <li>Acepta los términos y condiciones</li>
+                        <li>¡Publica tu evento!</li>
+                    </ol>
+                    <div class="highlight-tip">
+                        <strong>💡 Consejo:</strong> Sé específico en la descripción para atraer a las personas adecuadas.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="events">
+                <div class="faq-question">
+                    <span class="faq-icon">🎯</span>
+                    <span>¿Qué tipos de eventos puedo crear?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Puedes crear eventos de diferentes categorías:</p>
+                    <ul>
+                        <li><strong>🏃 Deportivos:</strong> Fútbol, running, ciclismo, natación, etc.</li>
+                        <li><strong>📚 Estudio:</strong> Grupos de estudio, talleres, conferencias</li>
+                        <li><strong>🎉 Sociales:</strong> Fiestas, reuniones, cenas, cine</li>
+                        <li><strong>🎨 Culturales:</strong> Exposiciones, conciertos, teatro</li>
+                        <li><strong>🔧 Otros:</strong> Voluntariado, intercambios, actividades especiales</li>
+                    </ul>
+                    <div class="warning-tip">
+                        <strong>🚫 Prohibido:</strong> Eventos ilegales, con armas, drogas, violencia o discriminación.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="events">
+                <div class="faq-question">
+                    <span class="faq-icon">👥</span>
+                    <span>¿Cómo me inscribo a un evento?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Para inscribirte a un evento:</p>
+                    <ol>
+                        <li>Encuentra el evento que te interesa en el mapa o feed</li>
+                        <li>Lee la descripción y términos del evento</li>
+                        <li>Haz clic en "Inscribirse"</li>
+                        <li>Confirma tu inscripción</li>
+                        <li>Recibirás un código QR para verificar tu asistencia</li>
+                    </ol>
+                    <p>Puedes ver todos tus eventos inscritos en "Mis Inscripciones".</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="events">
+                <div class="faq-question">
+                    <span class="faq-icon">❌</span>
+                    <span>¿Puedo cancelar mi inscripción a un evento?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Actualmente, las inscripciones no se pueden cancelar automáticamente desde la plataforma. Si necesitas cancelar tu participación:</p>
+                    <ol>
+                        <li>Contacta directamente al organizador del evento</li>
+                        <li>Explica tu situación</li>
+                        <li>El organizador puede gestionar tu cancelación</li>
+                    </ol>
+                    <div class="highlight-tip">
+                        <strong>💡 Consejo:</strong> Cancela con anticipación para ser considerado con el organizador.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preguntas sobre Seguridad -->
+            <div class="faq-item" data-category="safety">
+                <div class="faq-question">
+                    <span class="faq-icon">🛡️</span>
+                    <span>¿Es seguro usar GeoPlanner?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>GeoPlanner implementa varias medidas de seguridad:</p>
+                    <ul>
+                        <li>Verificación de identidad de usuarios</li>
+                        <li>Moderación de contenido</li>
+                        <li>Sistema de reportes</li>
+                        <li>Cooperación con autoridades cuando es necesario</li>
+                        <li>Términos y condiciones estrictos</li>
+                    </ul>
+                    <div class="warning-tip">
+                        <strong>⚠️ Recuerda:</strong> Siempre usa tu sentido común y reporta cualquier actividad sospechosa.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="safety">
+                <div class="faq-question">
+                    <span class="faq-icon">🚨</span>
+                    <span>¿Cómo reporto un evento o usuario inapropiado?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Si encuentras contenido inapropiado:</p>
+                    <ol>
+                        <li>Haz clic en el botón de reportar (🚨) en el evento o perfil</li>
+                        <li>Selecciona el motivo del reporte</li>
+                        <li>Proporciona detalles adicionales si es necesario</li>
+                        <li>Envía el reporte</li>
+                    </ol>
+                    <p>Nuestro equipo revisará todos los reportes en un plazo de 24-48 horas.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="safety">
+                <div class="faq-question">
+                    <span class="faq-icon">📍</span>
+                    <span>¿Quién puede ver mi ubicación?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Tu ubicación se maneja de la siguiente manera:</p>
+                    <ul>
+                        <li><strong>Ubicación de perfil:</strong> Solo visible para ti y en configuraciones específicas</li>
+                        <li><strong>Eventos públicos:</strong> La ubicación del evento es visible para todos</li>
+                        <li><strong>Eventos privados:</strong> Solo visible para invitados</li>
+                        <li><strong>Ubicación en tiempo real:</strong> Nunca se comparte automáticamente</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Preguntas Técnicas -->
+            <div class="faq-item" data-category="technical">
+                <div class="faq-question">
+                    <span class="faq-icon">⚙️</span>
+                    <span>¿En qué dispositivos funciona GeoPlanner?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>GeoPlanner es una aplicación web que funciona en:</p>
+                    <ul>
+                        <li><strong>Computadoras:</strong> Windows, Mac, Linux</li>
+                        <li><strong>Navegadores:</strong> Chrome, Firefox, Safari, Edge</li>
+                        <li><strong>Móviles:</strong> Android e iOS (a través del navegador)</li>
+                        <li><strong>Tablets:</strong> Compatible con todos los sistemas</li>
+                    </ul>
+                    <div class="highlight-tip">
+                        <strong>💡 Recomendación:</strong> Para mejor experiencia, usa Chrome o Firefox actualizado.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="technical">
+                <div class="faq-question">
+                    <span class="faq-icon">🗺️</span>
+                    <span>¿Por qué no funciona el mapa en mi dispositivo?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Si el mapa no carga correctamente:</p>
+                    <ol>
+                        <li>Verifica tu conexión a internet</li>
+                        <li>Permite el acceso a la ubicación en tu navegador</li>
+                        <li>Actualiza la página (F5 o Ctrl+R)</li>
+                        <li>Limpia la caché del navegador</li>
+                        <li>Prueba con otro navegador</li>
+                    </ol>
+                    <p>Si el problema persiste, contacta a soporte técnico.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="technical">
+                <div class="faq-question">
+                    <span class="faq-icon">📱</span>
+                    <span>¿Hay una aplicación móvil de GeoPlanner?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Actualmente, GeoPlanner funciona como una aplicación web optimizada para móviles. Puedes:</p>
+                    <ul>
+                        <li>Acceder desde cualquier navegador móvil</li>
+                        <li>Agregar un acceso directo a tu pantalla de inicio</li>
+                        <li>Usar todas las funciones desde tu teléfono</li>
+                    </ul>
+                    <div class="highlight-tip">
+                        <strong>🚀 Próximamente:</strong> Estamos trabajando en aplicaciones nativas para Android e iOS.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preguntas sobre Privacidad -->
+            <div class="faq-item" data-category="privacy">
+                <div class="faq-question">
+                    <span class="faq-icon">🔒</span>
+                    <span>¿Cómo protege GeoPlanner mis datos personales?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Protegemos tus datos mediante:</p>
+                    <ul>
+                        <li>Encriptación de datos sensibles</li>
+                        <li>Servidores seguros</li>
+                        <li>Acceso limitado a información personal</li>
+                        <li>Cumplimiento de regulaciones de privacidad</li>
+                        <li>Auditorías regulares de seguridad</li>
+                    </ul>
+                    <p>Lee nuestra <a href="privacidad.html">Política de Privacidad</a> para más detalles.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="privacy">
+                <div class="faq-question">
+                    <span class="faq-icon">👁️</span>
+                    <span>¿Puedo controlar quién ve mis eventos?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Sí, tienes control total sobre la privacidad de tus eventos:</p>
+                    <ul>
+                        <li><strong>🔓 Público:</strong> Visible para todos los usuarios</li>
+                        <li><strong>👥 Solo amigos:</strong> Visible solo para tus amigos</li>
+                        <li><strong>🔒 Privado:</strong> Solo por invitación directa</li>
+                    </ul>
+                    <p>Puedes cambiar la configuración de privacidad al crear el evento.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="privacy">
+                <div class="faq-question">
+                    <span class="faq-icon">🗑️</span>
+                    <span>¿Puedo eliminar mi cuenta y todos mis datos?</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Sí, puedes eliminar tu cuenta en cualquier momento:</p>
+                    <ol>
+                        <li>Ve a Configuración de cuenta</li>
+                        <li>Selecciona "Eliminar cuenta"</li>
+                        <li>Confirma tu decisión</li>
+                        <li>Todos tus datos serán eliminados permanentemente</li>
+                    </ol>
+                    <div class="warning-tip">
+                        <strong>⚠️ Importante:</strong> Esta acción no se puede deshacer.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-section">
+            <h4>¿No encontraste tu respuesta?</h4>
+            <p>Nuestro equipo de soporte está aquí para ayudarte</p>
+            <div class="medios">
+                <div class="col-md-4">
+                    <h6>📧 Email</h6>
+                    <a id="contacto-email" href="mailto:geoplaner.contact@gmail.com">geoplaner.contact@gmail.com</a>
+                </div>
+                <div class="col-md-4">
+                    <h6>📞 Teléfono</h6>
+                    <a href="https://walink.co/d6e9df">+58 412 6759039</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-bar">
+        <div class="container-fluid d-flex flex-wrap justify-content-between align-items-center px-4 py-3">
+            <span class="footer-text">© 2025 GeoPlanner. Todos los derechos reservados — Creado por The GeoPlanner Group.</span>
+            <div class="footer-links d-flex flex-wrap gap-3">
+                <a href="terminos.html" class="footer-link" target="_blank">Términos</a>
+                <a href="privacidad.html" class="footer-link" target="_blank">Privacidad</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // Redirección a Gmail al hacer click en el botón de contacto
+            const contactoBtn = document.getElementById('contacto-email');
+            if (contactoBtn) {
+                contactoBtn.addEventListener('click', function () {
+                    const destinatario = 'geoplanner.contact@gmail.com';
+                    const asunto = encodeURIComponent('Ayuda desde GeoPlanner');
+                    const cuerpo = encodeURIComponent('Describe aqui tu problema...');
+                    const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${destinatario}&su=${asunto}&body=${cuerpo}`;
+                    window.open(url, '_blank');
+                });
+            }
+
+            // Aplicar tema guardado
+            const tema = localStorage.getItem('geoPlannerTema') || 'default';
+            
+            const temas = {
+                default: {
+                    headerBG: "linear-gradient(145deg, #007BFF, #003366)",
+                    headerText: "white",
+                    bodyBG: "#f0f2f5",
+                    cardBG: "#ffffff",
+                    cardText: "#333",
+                    btnPrimaryBG: "#00bfff"
+                },
+                noche: {
+                    headerBG: "linear-gradient(145deg, #141E30, #243B55)",
+                    headerText: "white",
+                    bodyBG: "#0f172a",
+                    cardBG: "#1e293b",
+                    cardText: "#e2e8f0",
+                    btnPrimaryBG: "#38bdf8"
+                },
+                aurora: {
+                    headerBG: "linear-gradient(145deg, #F8CDDA, #1D2B64)",
+                    headerText: "#FFFFFF",
+                    bodyBG: "#fdeff2",
+                    cardBG: "#ffffff",
+                    cardText: "#1D2B64",
+                    btnPrimaryBG: "#1D2B64"
+                }
+            };
+
+            const currentTheme = temas[tema] || temas.default;
+            const root = document.documentElement;
+            
+            root.style.setProperty('--header-bg', currentTheme.headerBG);
+            root.style.setProperty('--header-text-color', currentTheme.headerText);
+            root.style.setProperty('--body-bg', currentTheme.bodyBG);
+            root.style.setProperty('--card-bg', currentTheme.cardBG);
+            root.style.setProperty('--card-text-color', currentTheme.cardText);
+            root.style.setProperty('--btn-primary-bg', currentTheme.btnPrimaryBG);
+            root.style.setProperty('--btn-primary-text', currentTheme.headerText);
+
+            // Funcionalidad de FAQ
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            const searchInput = document.getElementById('searchInput');
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            const faqItems = document.querySelectorAll('.faq-item');
+
+            // Toggle FAQ answers
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    const answer = this.nextElementSibling;
+                    const icon = this.querySelector('.expand-icon');
+                    
+                    if (answer.classList.contains('show')) {
+                        answer.classList.remove('show');
+                        icon.classList.remove('rotated');
+                    } else {
+                        // Close all other answers
+                        document.querySelectorAll('.faq-answer.show').forEach(openAnswer => {
+                            openAnswer.classList.remove('show');
+                        });
+                        document.querySelectorAll('.expand-icon.rotated').forEach(rotatedIcon => {
+                            rotatedIcon.classList.remove('rotated');
+                        });
+                        
+                        // Open clicked answer
+                        answer.classList.add('show');
+                        icon.classList.add('rotated');
+                    }
+                });
+            });
+
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                faqItems.forEach(item => {
+                    const question = item.querySelector('.faq-question span:nth-child(2)').textContent.toLowerCase();
+                    const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+                    
+                    if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            // Category filtering
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const category = this.dataset.category;
+                    
+                    // Update active tab
+                    categoryTabs.forEach(t => {
+                        t.classList.remove('active');
+                        t.classList.add('inactive');
+                    });
+                    this.classList.add('active');
+                    this.classList.remove('inactive');
+                    
+                    // Filter FAQ items
+                    faqItems.forEach(item => {
+                        if (category === 'all' || item.dataset.category === category) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                    
+                    // Clear search
+                    searchInput.value = '';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
