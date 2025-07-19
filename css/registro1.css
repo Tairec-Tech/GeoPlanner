@@ -1,0 +1,113 @@
+body {
+  background-color: #f8f9fa;
+  padding-bottom: 80px; /* Añadido para dar espacio al footer */
+}
+
+main {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.register-container {
+  background: linear-gradient(145deg, #007bff, #003366);
+  color: white;
+  padding: 2.5rem;
+  border-radius: 15px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  animation: fadeSlideUp 1s ease forwards;
+}
+
+.logo-drop {
+  animation: dropIn 1s ease-out;
+  text-align: center;
+}
+
+.logo-spin {
+  width: 90px;
+  margin-bottom: 1rem;
+  animation: spinY 6s linear infinite;
+}
+
+@keyframes dropIn {
+  0% {
+    transform: translateY(-100px) scale(1.2);
+    opacity: 0;
+  }
+  70% {
+    transform: translateY(10px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes spinY {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-label {
+  color: #dce9ff;
+  font-weight: 500;
+}
+
+.form-control,
+.form-select {
+  border-radius: 10px;
+}
+
+.btn-custom {
+  background-color: #00bfff;
+  color: white;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px #00bfff88;
+}
+
+.btn-custom:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 20px #00bfffcc;
+}
+
+.footer-bar {
+  background-color: #ffffff;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+  position: fixed; /* Modificado para fijar el footer */
+  bottom: 0;
+  left: 0;
+  z-index: 1030;
+}
+
+.footer-bar a,
+.footer-bar span {
+  font-size: 1rem;
+  color: #555;
+}
+
+.footer-bar a:hover {
+  text-decoration: underline;
+}
+
+#otroGeneroInput {
+  display: none;
+}

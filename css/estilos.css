@@ -83,3 +83,34 @@ body {
 footer {
   font-size: 0.9rem;
 }
+
+/* Tipografía elegante general */
+body {
+  font-family: 'Georgia', serif;
+  color: #3d2b1f;
+}
+
+h1, h2, h3, .section-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: bold;
+  color: #5e412f;
+}
+
+/* Sección "¿Quiénes somos?" */
+.quienes-somos {
+  background-color: #fef0c8;
+}
+
+.quienes-somos .lead {
+  font-size: 1.2rem;
+  color: #4a3220;
+}
+
+.quienes-somos p {
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.text-justify {
+  text-align: justify;
+}
